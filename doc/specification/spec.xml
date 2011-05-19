@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <articleinfo>
+    <title>Specification of libsynctory</title>
+
+    <author>
+      <firstname>Jesco</firstname>
+
+      <surname>Freund</surname>
+
+      <affiliation>
+        <orgname>The Backtory Project</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>2010-06-19</pubdate>
+  </articleinfo>
+
+  <sect1>
+    <title>Introduction</title>
+
+    <para>libsynctory is being developed as part of the Backtory project. Its
+    purpose is to provide means for efficiently creating differential backups
+    on a per-file base, for any binary file. The idea for libsynctory was
+    taken from the principles of the rsync algorithm, but the implementation
+    happens independently of rsync or librsync.</para>
+
+    <para>The general idea is to create binary fingerprints of a file. Only
+    using this fingerprint from the original version of a file, it should be
+    possible to generate a binary difference between the original and the
+    current version of a file. This difference can be used to restore the
+    current version from the original version. Therefore, only the
+    fingerprints of the original (fully backed up) files are required during
+    backup creation.</para>
+  </sect1>
+
+  <sect1>
+    <title>File Formats</title>
+
+    <para></para>
+
+    <sect2>
+      <title>General</title>
+
+      <para>To grant an easy and consistent exchange of libsynctory files
+      between different operating systems and platforms, all multi-byte values
+      (such as integers etc.) are stored in network byte order, meaning big
+      endian format. This fact won't bother anyone using the provided API.
+      However, knowing about this fact is crucial to understand the following
+      specification of the different file formats.</para>
+    </sect2>
+
+    <sect2>
+      <title>The Synctory Fingerprint Format</title>
+
+      <para></para>
+
+      <sect3>
+        <title>Purpose</title>
+
+        <para>The Synctory fingerprint format stores the chunked fingerprint
+        of a file. The information contained in a fingerprint file must be
+        present for being able to construct a binary difference to any other
+        file without being forced to come back to the content of the original
+        file.</para>
+      </sect3>
+
+      <sect3>
+        <title>File Header</title>
+
+        <para>The header of a fingerprint file is 20 bytes long. It is
+        allocated as follows:</para>
+
+        <table>
+          <title>Allocation of Synctory Fingerprint Header Bytes</title>
+
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry align="center">Offset (Bytes)</entry>
+
+                <entry align="center">Length (Bytes)</entry>
+
+                <entry align="center">Description</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>0</entry>
+
+                <entry>8</entry>
+
+                <entry>libsynctory version number</entry>
+              </row>
+
+              <row>
+                <entry>8</entry>
+
+                <entry>8</entry>
+
+                <entry>size of originating file in bytes</entry>
+              </row>
+
+              <row>
+                <entry>16</entry>
+
+                <entry>2</entry>
+
+                <entry>chunk size used on originating file</entry>
+              </row>
+
+              <row>
+                <entry>18</entry>
+
+                <entry>1</entry>
+
+                <entry>constant to identify weak and strong checksum combo
+                being used in this file</entry>
+              </row>
+
+              <row>
+                <entry>19</entry>
+
+                <entry>1</entry>
+
+                <entry>zero byte used as header terminator</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </sect3>
+
+      <sect3>
+        <title>File Content</title>
+
+        <para>After the file header (offset of 20 bytes), the checksum pairs
+        are stored. Each chunk is represented by exactly one checksum pair. A
+        checksum pair is n bytes long, where n is defined as
+        SYNCTORY_STRONG_CHECKSUM_BYTES + 4. The first four bytes are reserved
+        for the weak checksum. The weak checksum is an unsigend 32 bit integer
+        and stored in big endian order. The last n - 4 bytes are reserved for
+        the strong checksum. Since the latter one is always a buffer of
+        unsigned bytes, byte order doesn't matter.</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title></title>
+
+      <para></para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title></title>
+
+    <para></para>
+  </sect1>
+</article>
