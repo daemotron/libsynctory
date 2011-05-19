@@ -1,0 +1,6 @@
+*.so
+*.[oa]
+*.kdev4
+*.txt.user
+*~
+build/
