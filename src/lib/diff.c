@@ -43,7 +43,7 @@
 #include "_fingerprint.h"
 #include "_fheader.h"
 #include "_file64.h"
-#include "libsynctory/version.h"
+#include "version.h"
 
 
 /**

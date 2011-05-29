@@ -37,7 +37,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "libsynctory/version.h"
+#include "version.h"
 #include "_checksum.h"
 #include "_fingerprint.h"
 #include "_endianess.h"

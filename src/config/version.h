@@ -27,53 +27,51 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *  $Id$
  */
 
-#ifndef __LIBSYNCTORY_FILE64_H
-#define __LIBSYNCTORY_FILE64_H
+#ifndef __LIBSYNCTORY_VERSION_H
+#define __LIBSYNCTORY_VERSION_H
 
-/*	NOTE
-	unistd.h provides the seek whence flags. This include is just for
-	convenience, granting the seek function to work properly even when
-	unistd.h is not explicitly included.
-*/
-#include <unistd.h>
 #include <stdint.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
-#include "config.h"
-
-#define SYNCTORY_FILE64_BUFSIZE 512
 
 /*
- * FIXME
- * 
- * This is bullshit; it doesn't work in FBSD/AMD64
- * => kill that glibc-related fuckup
+ * Do not change these definitions!
  */
 
-#if (defined HAVE_STAT_R) && (!defined HAVE_STAT64_R)
-typedef struct stat synctory_file64_stat_t;
-#elif (defined HAVE_STAT64_R) && (defined HAVE_LARGEFILE_S)
-typedef struct stat64 synctory_file64_stat_t;
-#else
-#error "libsynctory only supports 64 bit file pointers!\n"
-#endif
+#define LIBSYNCTORY_CURRENT     0x00
+#define LIBSYNCTORY_STABLE      0x22
+#define LIBSYNCTORY_ALPHA       0x44
+#define LIBSYNCTORY_BETA        0x66
+#define LIBSYNCTORY_PRERELEASE  0x88
+#define LIBSYNCTORY_RELEASE     0xFF
 
-#if (OFFT_SIZE == 8)
-typedef off_t synctory_off_t;
-#elif (OFFT_SIZE < 8) && (defined OFF64T_SIZE)
-typedef off64_t synctory_off_t;
-#else
-#error "libsynctory only supports 64 bit file pointers!\n"
-#endif
+/*
+ * Configure release information here 
+ */
 
-extern int synctory_file64_open(const char *path, int oflag, ...);
-extern int synctory_file64_close(int fd);
-extern synctory_off_t synctory_file64_seek(int fd, int64_t offset, int whence);
-extern synctory_off_t synctory_file64_bytecopy(int fdsource, int fddest, synctory_off_t offset, synctory_off_t bytes);
+#define LIBSYNCTORY_VERSION_MAJOR       1
+#define LIBSYNCTORY_VERSION_MINOR       0
+#define LIBSYNCTORY_VERSION_PATCH       0
+#define LIBSYNCTORY_VERSION_FLAVOUR     LIBSYNCTORY_CURRENT
+#define LIBSYNCTORY_VERSION_SUFFX       0
 
-#endif /* __LIBSYNCTORY_FILE64_H */
+/* 
+ * The pattern for the numeric version follows this syntax:
+ *
+ *   0xAABBCCDDEE
+ *
+ * AA is the major, BB the minor and CC the patch version.
+ * DD represents the flavour and EE the suffix (only applicable
+ * to ALPHA, BETA and PRERELEASE flavours; otherwise it will
+ * be ignored and should be set to 0).
+ * Each of them always represented as two-digit hex number.
+ */
+#define LIBSYNCTORY_VERSION_NUM \
+      (((uint64_t) LIBSYNCTORY_VERSION_MAJOR)   << 32) \
+    | (((uint64_t) LIBSYNCTORY_VERSION_MINOR)   << 24) \
+    | (((uint64_t) LIBSYNCTORY_VERSION_PATCH)   << 16) \
+    | (((uint64_t) LIBSYNCTORY_VERSION_FLAVOUR) << 8) \
+    | ((uint64_t)  LIBSYNCTORY_VERSION_SUFFX)
+
+#endif /* __LIBSYNCTORY_VERSION_H */
