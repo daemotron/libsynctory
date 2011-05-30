@@ -79,7 +79,11 @@ synctory_file64_open(const char *path, int oflag, ...)
 	if ((O_CREAT & oflag) == O_CREAT)
 	{
 		va_start(vargptr, oflag);
+#ifdef __FreeBSD__
+                mode = va_arg(vargptr, int);
+#else
 		mode = va_arg(vargptr, mode_t);
+#endif
 		va_end(vargptr);
 #if (OFFT_SIZE == 8) || ((OFFT_SIZE == 4) && (!defined HAVE_OPEN64_F) && (defined HAVE_LARGEFILE_S))
 		return open(path, oflag, mode);

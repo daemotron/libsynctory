@@ -1,55 +1,77 @@
-/**
- * Copyright (c) 2010 Jesco Freund.
- * All rights reserved.
+/*-
+ * Copyright (c) 2011 Daemotron <mail@daemotron.net>
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of Backtory nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * $Id$
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 
 #ifndef __LIBSYNCTORY_SYNCTORY_H
 #define __LIBSYNCTORY_SYNCTORY_H
 
-/*
-	To use the synctory library, it is generally sufficient to
-	include this header file as single interface to libsynctory's
-	core functionality.
-	
-	WARNING
-	It is not recommended to include header files from include/libsynctory
-	directly, as they may lack from proper initialisation or similar.
-	
-	However, to learn about the interface, it is recommended to study
-	these header files since they contain the (commented) prototypes of
-	the publicly available interface functions.
-*/
 
-#include <libsynctory/diff.h>
-#include <libsynctory/fingerprint.h>
-#include <libsynctory/synth.h>
+#include <stdint.h>
+
+
+/**
+ * Available strong checksum algorithms
+ * 
+ * The strong checksum algorithm is used during fingerprint creation and for
+ * verification purposes. Since the strong checksum also becomes part of the
+ * fingerprint, it is recommended to find a balance between collision safety,
+ * runtime performance and fingerprint size.
+ */
+typedef enum
+{
+    synctory_strchk_rmd160      = 0x10,
+    synctory_strchk_sha1        = 0x20
+} synctory_checksum_algo_t;
+
+
+/**
+ * The libsynctory context object
+ * 
+ * The libsynctory context object (LCO) is used to configure the behaviour of
+ * libsynctory within the given boundaries.
+ * 
+ * chunk_size           The chunk size to use when creating a fingerprint. When 
+ *                      operating on existing fingerprints, this option has
+ *                      no effect, since the chunk size is automatically detected
+ *                      in this case.
+ * 
+ * checksum_algorithm   The strong checksum algorthim to use when creating a
+ *                      fingerprint. When operating on existing fingerprints, this
+ *                      option has no effect, since the algorithm used to generate
+ *                      a fingerprint is detected automatically from the fingerprint
+ *                      header information.
+ */
+typedef struct
+{
+    uint16_t chunk_size;
+    synctory_checksum_algo_t checksum_algorithm;
+} synctory_ctx_t;
+
+
+/**
+ * Create a fingerprint from the source file descriptor and
+ * store it in the file designated by the dest file descriptor.
+ */
+extern int synctory_fingerprint_create_fd(int source, int dest);
+
+
+/**
+ * Create a fingerprint from the file named sourcefile and
+ * store it in the file named destfile
+ */
+extern int synctory_fingerprint_create_fn(const char *sourcefile, const char *destfile);
 
 #endif /* __LIBSYNCTORY_SYNCTORY_H */
