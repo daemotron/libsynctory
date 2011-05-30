@@ -15,9 +15,31 @@
  */
 
 #include <synctory.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "config.h"
 #include "version.h"
 
+extern uint64_t
+synctory_version_num(void)
+{
+    return LIBSYNCTORY_VERSION_NUM;
+}
 
+
+extern size_t
+synctory_version_bytes(void)
+{
+    return strlen(PACKAGE_VERSION) + 1;
+}
+
+
+extern void
+synctory_version_str(void *buffer, size_t len)
+{
+    size_t maxlen = (strlen(PACKAGE_VERSION) > (len - 1) ? len - 1 : strlen(PACKAGE_VERSION));
+    strncpy((char *)buffer, PACKAGE_VERSION, maxlen);
+    buffer[maxlen] = '\0';
+}

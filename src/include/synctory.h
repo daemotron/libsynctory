@@ -19,6 +19,7 @@
 #define __LIBSYNCTORY_SYNCTORY_H
 
 
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -62,6 +63,31 @@ typedef struct
 
 
 /**
+ * Get library version number as numeric type allowing comparisons
+ * using standard relational operators. Newer versions always have
+ * greater version numbers than older versions of libsynctory.
+ */
+extern uint64_t synctory_version_num(void);
+
+
+/**
+ * Write version information string into the provided buffer.
+ * The provided buffer should have a minimum size of
+ * synctory_version_bytes() - otherwise it would not be able
+ * to contain the entire version string.
+ */
+extern void synctory_version_str(void *buffer, size_t len);
+
+
+/**
+ * Get the size requirement in bytes for a buffer to contain the
+ * libsynctory version string. Included in the requirement is the
+ * space for the string terminator byte.
+ */
+extern size_t synctory_version_bytes(void);
+
+
+/**
  * Create a fingerprint from the source file descriptor and
  * store it in the file designated by the dest file descriptor.
  */
@@ -73,5 +99,6 @@ extern int synctory_fingerprint_create_fd(int source, int dest);
  * store it in the file named destfile
  */
 extern int synctory_fingerprint_create_fn(const char *sourcefile, const char *destfile);
+
 
 #endif /* __LIBSYNCTORY_SYNCTORY_H */
