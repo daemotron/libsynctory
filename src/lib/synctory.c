@@ -15,18 +15,18 @@
  */
 
 #include <synctory.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "config.h"
 #include "version.h"
 
-extern uint64_t
-synctory_version_num(void)
-{
-    return LIBSYNCTORY_VERSION_NUM;
-}
+#include "_file64.h"
+#include "_fingerprint.h"
 
 
 extern size_t
@@ -37,9 +37,39 @@ synctory_version_bytes(void)
 
 
 extern void
-synctory_version_str(void *buffer, size_t len)
+synctory_version(uint64_t *num, void *buffer, size_t len)
 {
-    size_t maxlen = (strlen(PACKAGE_VERSION) > (len - 1) ? len - 1 : strlen(PACKAGE_VERSION));
-    strncpy((char *)buffer, PACKAGE_VERSION, maxlen);
-    buffer[maxlen] = '\0';
+    if (NULL != num)
+        *num = LIBSYNCTORY_VERSION_NUM;
+    
+    if (NULL != buffer)
+    {
+        char *bf = (char *)buffer;
+        size_t maxlen = (strlen(PACKAGE_VERSION) > (len - 1) ? len - 1 : strlen(PACKAGE_VERSION));
+        strncpy(bf, PACKAGE_VERSION, maxlen);
+        bf[maxlen] = '\0';
+    }
+}
+
+
+extern int
+synctory_fingerprint_create(int source_fd, int dest_fd, const char *source_file, const char *dest_file)
+{
+    /* sfd = source file descriptor, dfd = destination file descriptor */
+    int sfd = 0;
+    int dfd = 0;
+    int flag[2] = {0, 0};
+    int rval = 0;
+    
+    sfd = _synctory_file64_get_fd(&flag[0], source_fd, source_file, 'r');
+    dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
+    
+    rval = synctory_fingerprint_create_fd(sfd, dfd);
+    
+    if (flag[0])
+        synctory_file64_close(sfd);
+    if (flag[1])
+        synctory_file64_close(dfd);
+
+    return rval;
 }

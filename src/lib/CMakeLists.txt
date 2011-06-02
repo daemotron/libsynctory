@@ -3,14 +3,15 @@ include_directories(${libsynctory_SOURCE_DIR}/src/config ${libsynctory_SOURCE_DI
 # source files that should be compiled into the library have
 # to be added to this list
 set(
-	LIBSYNCTORY_SOURCEFILES
-	checksum.c
-	diff.c
-	endianess.c
-	fheader.c
-	file64.c
-	fingerprint.c
-	synth.c
+    LIBSYNCTORY_SOURCEFILES
+    checksum.c
+    diff.c
+    endianess.c
+    fheader.c
+    file64.c
+    fingerprint.c
+    synth.c
+    synctory.c
 )
 
 # check whether liblzma can be used
@@ -22,7 +23,7 @@ set(
 # check whether libssl can be used
 find_library(SSL_LIB ssl)
 if(SSL_LIB)
-	list(APPEND LIBSYNCTORY_LIBRARIES ${SSL_LIB})
+    list(APPEND LIBSYNCTORY_LIBRARIES ${SSL_LIB})
 endif(SSL_LIB)
 
 # build shared library binary
@@ -30,12 +31,12 @@ add_library(synctory SHARED ${LIBSYNCTORY_SOURCEFILES})
 
 # link it to other libs
 if(LIBSYNCTORY_LIBRARIES)
-	target_link_libraries(synctory ${LIBSYNCTORY_LIBRARIES})
+    target_link_libraries(synctory ${LIBSYNCTORY_LIBRARIES})
 endif(LIBSYNCTORY_LIBRARIES)
 
 set_target_properties(synctory PROPERTIES VERSION ${LIBSYNCTORY_LIBVERSION} SOVERSION ${LIBSYNCTORY_LIBVERSION})
 
 install(
-	TARGETS synctory
-	LIBRARY DESTINATION lib
+    TARGETS synctory
+    LIBRARY DESTINATION lib
 )

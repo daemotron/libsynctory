@@ -75,5 +75,6 @@ extern int synctory_file64_open(const char *path, int oflag, ...);
 extern int synctory_file64_close(int fd);
 extern synctory_off_t synctory_file64_seek(int fd, int64_t offset, int whence);
 extern synctory_off_t synctory_file64_bytecopy(int fdsource, int fddest, synctory_off_t offset, synctory_off_t bytes);
+int _synctory_file64_get_fd(int *flag, int fd, const char *path, char mode);
 
 #endif /* __LIBSYNCTORY_FILE64_H */

@@ -63,20 +63,22 @@ typedef struct
 
 
 /**
- * Get library version number as numeric type allowing comparisons
- * using standard relational operators. Newer versions always have
- * greater version numbers than older versions of libsynctory.
+ * Get library version information.
+ * 
+ * This function writes the version information as numeric type into the
+ * provided uint64_t memory, allowing comparisons using standard relational
+ * operators. Newer versions always have greater version numbers than older 
+ * versions of libsynctory. 
+ * 
+ * The version information string is written into the provided buffer. 
+ * The provided buffer should have a minimum size of synctory_version_bytes()
+ * - otherwise it would not be able to contain the entire version string.
+ * 
+ * To skip retrieval of one of the offered formats, simply provide a
+ * NULL pointer instead of a valid pointer for the format you do not want
+ * to retrieve.
  */
-extern uint64_t synctory_version_num(void);
-
-
-/**
- * Write version information string into the provided buffer.
- * The provided buffer should have a minimum size of
- * synctory_version_bytes() - otherwise it would not be able
- * to contain the entire version string.
- */
-extern void synctory_version_str(void *buffer, size_t len);
+extern void synctory_version(uint64_t *num, void *buffer, size_t len);
 
 
 /**
@@ -88,17 +90,21 @@ extern size_t synctory_version_bytes(void);
 
 
 /**
- * Create a fingerprint from the source file descriptor and
- * store it in the file designated by the dest file descriptor.
+ * Create fingerprint from source file and store it in destination file.
+ * 
+ * As arguments, this function takes the source and destination file. Both
+ * can be provided either as file descriptor or as path string. The file
+ * descriptor has a higher priority, i. e. if both file descriptor and path
+ * name are provided, only the file descriptor will be used; the pathname
+ * is ignored in this case.
+ * 
+ * It is possible to indicate mixed arguments, e. g. indicate the source file
+ * as path name and the destination file as file descriptor.
+ * 
+ * To skip one form of indication, simply provide a NULL pointer for path names,
+ * or a negative integer (usually -1) for the file descriptor.
  */
-extern int synctory_fingerprint_create_fd(int source, int dest);
-
-
-/**
- * Create a fingerprint from the file named sourcefile and
- * store it in the file named destfile
- */
-extern int synctory_fingerprint_create_fn(const char *sourcefile, const char *destfile);
+extern int synctory_fingerprint_create(int source_fd, int dest_fd, const char *source_file, const char *dest_file);
 
 
 #endif /* __LIBSYNCTORY_SYNCTORY_H */

@@ -97,4 +97,17 @@ extern int synctory_fingerprint_fetchheader_fd(int fd, synctory_fheader_t *heade
 extern int synctory_fingerprint_fetchheader_fn(const char *fpfile, synctory_fheader_t *header);
 extern int synctory_fingerprint_read_iter_fd(int fd, uint32_t *weaksum, unsigned char *strongsum, size_t len, synctory_fingerprint_iterctx_t *ctx);
 
+/**
+ * Create a fingerprint from the source file descriptor and
+ * store it in the file designated by the dest file descriptor.
+ */
+extern int synctory_fingerprint_create_fd(int source, int dest);
+
+
+/**
+ * Create a fingerprint from the file named sourcefile and
+ * store it in the file named destfile
+ */
+extern int synctory_fingerprint_create_fn(const char *sourcefile, const char *destfile);
+
 #endif /* __LIBSYNCTORY_FINGERPRINT_H_ */

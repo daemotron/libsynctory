@@ -107,6 +107,31 @@ synctory_file64_open(const char *path, int oflag, ...)
 }
 
 
+int 
+_synctory_file64_get_fd(int *flag, int fd, const char *path, char mode)
+{
+    if (fd > 0)
+    {
+        *flag = 0;
+        return fd;
+    }
+    else
+    {
+        if (NULL == path)
+            return -1;
+        else
+        {
+            *flag = 1;
+            if ('r' == mode)
+                return synctory_file64_open(path, O_RDONLY);
+            else if ('w' == mode)
+                return synctory_file64_open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            else
+                return -1;
+        }
+    }
+}
+
 extern int
 synctory_file64_close(int fd)
 {
