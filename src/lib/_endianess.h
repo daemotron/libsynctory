@@ -39,8 +39,8 @@
 
 typedef enum
 {
-	LITTLEENDIAN,
-	BIGENDIAN
+    LITTLEENDIAN,
+    BIGENDIAN
 } synctory_endianess_t;
 
 

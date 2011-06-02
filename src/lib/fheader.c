@@ -65,33 +65,33 @@
 extern int
 synctory_fh_setheader_bf(synctory_fheader_t *header, void *buffer, size_t len)
 {
-	unsigned char *ptr = (unsigned char *)buffer;
-	uint64_t version = synctory_hton64((uint64_t)LIBSYNCTORY_VERSION_NUM);
-	uint64_t size = synctory_hton64(header->filesize);
-	uint16_t chunksize = synctory_hton16(header->chunksize);
-	uint16_t algo = synctory_hton16((((uint16_t)header->algo) << 8));
-	uint32_t ftype = synctory_hton32(((uint32_t)SYNCTORY_FH_IDENTIFIER) | ((uint32_t)header->type));
-	int i = 0;
-	
-	if (len < SYNCTORY_FH_BYTES)
-		return ERANGE;
-	
-	for (i = 0; i < 4; ++i)
-		ptr[i] = *(((unsigned char *)&ftype)+i);
-	
-	for (i = 0; i < 8; ++i)
-		ptr[i+4] = *(((unsigned char *)&version)+i);
-	
-	for (i = 0; i < 8; ++i)
-		ptr[i+12] = *(((unsigned char *)&size)+i);
-	
-	for (i = 0; i < 2; ++i)
-		ptr[i+20] = *(((unsigned char *)&chunksize)+i);
-	
-	for (i = 0; i < 2; ++i)
-		ptr[i+22] = *(((unsigned char *)&algo)+i);
-	
-	return 0;
+    unsigned char *ptr = (unsigned char *)buffer;
+    uint64_t version = synctory_hton64((uint64_t)LIBSYNCTORY_VERSION_NUM);
+    uint64_t size = synctory_hton64(header->filesize);
+    uint16_t chunksize = synctory_hton16(header->chunksize);
+    uint16_t algo = synctory_hton16((((uint16_t)header->algo) << 8));
+    uint32_t ftype = synctory_hton32(((uint32_t)SYNCTORY_FH_IDENTIFIER) | ((uint32_t)header->type));
+    int i = 0;
+    
+    if (len < SYNCTORY_FH_BYTES)
+        return ERANGE;
+    
+    for (i = 0; i < 4; ++i)
+        ptr[i] = *(((unsigned char *)&ftype)+i);
+    
+    for (i = 0; i < 8; ++i)
+        ptr[i+4] = *(((unsigned char *)&version)+i);
+    
+    for (i = 0; i < 8; ++i)
+        ptr[i+12] = *(((unsigned char *)&size)+i);
+    
+    for (i = 0; i < 2; ++i)
+        ptr[i+20] = *(((unsigned char *)&chunksize)+i);
+    
+    for (i = 0; i < 2; ++i)
+        ptr[i+22] = *(((unsigned char *)&algo)+i);
+    
+    return 0;
 }
 
 
@@ -104,21 +104,21 @@ synctory_fh_setheader_bf(synctory_fheader_t *header, void *buffer, size_t len)
 extern int
 synctory_fh_getheader_bf(synctory_fheader_t *header, void *buffer, size_t len)
 {
-	unsigned char *ptr = (unsigned char *)buffer;
-	
-	if (len < SYNCTORY_FH_BYTES)
-		return ERANGE;
-	
-	if (SYNCTORY_FH_IDENTIFIER != (synctory_ntoh32(*((uint32_t *)ptr)) & 0xFFFFFF00U))
-		return EINVAL;
-	
-	header->type = (uint8_t)ptr[3];
-	header->version = synctory_ntoh64(*((uint64_t*)&ptr[4]));
-	header->filesize = synctory_ntoh64(*((uint64_t*)&ptr[12]));
-	header->chunksize = synctory_ntoh16(*((uint16_t*)&ptr[20]));
-	header->algo = (uint8_t)ptr[22];
-	
-	return 0;
+    unsigned char *ptr = (unsigned char *)buffer;
+    
+    if (len < SYNCTORY_FH_BYTES)
+        return ERANGE;
+    
+    if (SYNCTORY_FH_IDENTIFIER != (synctory_ntoh32(*((uint32_t *)ptr)) & 0xFFFFFF00U))
+        return EINVAL;
+    
+    header->type = (uint8_t)ptr[3];
+    header->version = synctory_ntoh64(*((uint64_t*)&ptr[4]));
+    header->filesize = synctory_ntoh64(*((uint64_t*)&ptr[12]));
+    header->chunksize = synctory_ntoh16(*((uint16_t*)&ptr[20]));
+    header->algo = (uint8_t)ptr[22];
+    
+    return 0;
 }
 
 
@@ -130,17 +130,17 @@ synctory_fh_getheader_bf(synctory_fheader_t *header, void *buffer, size_t len)
 extern int
 synctory_fh_getheader_fd(synctory_fheader_t *header, int fd)
 {
-	unsigned char buffer[SYNCTORY_FH_BYTES];
-	ssize_t rbytes;
-	
-	if (synctory_file64_seek(fd, 0, SEEK_SET) < 0)
-		return errno;
-	
-	rbytes = read(fd, buffer, SYNCTORY_FH_BYTES);
-	if (rbytes != SYNCTORY_FH_BYTES)
-		return -1;
-	
-	return synctory_fh_getheader_bf(header, buffer, SYNCTORY_FH_BYTES);
+    unsigned char buffer[SYNCTORY_FH_BYTES];
+    ssize_t rbytes;
+    
+    if (synctory_file64_seek(fd, 0, SEEK_SET) < 0)
+        return errno;
+    
+    rbytes = read(fd, buffer, SYNCTORY_FH_BYTES);
+    if (rbytes != SYNCTORY_FH_BYTES)
+        return -1;
+    
+    return synctory_fh_getheader_bf(header, buffer, SYNCTORY_FH_BYTES);
 }
 
 
@@ -152,13 +152,13 @@ synctory_fh_getheader_fd(synctory_fheader_t *header, int fd)
 extern int
 synctory_fh_getheader_fn(synctory_fheader_t *header, const char *filename)
 {
-	int fd, rval = 0;
-	
-	fd = synctory_file64_open(filename, O_RDONLY);
-	if (fd < 0)
-		return errno;
-	
-	rval = synctory_fh_getheader_fd(header, fd);
-	synctory_file64_close(fd);
-	return rval;
+    int fd, rval = 0;
+    
+    fd = synctory_file64_open(filename, O_RDONLY);
+    if (fd < 0)
+        return errno;
+    
+    rval = synctory_fh_getheader_fd(header, fd);
+    synctory_file64_close(fd);
+    return rval;
 }

@@ -44,8 +44,8 @@
 synctory_endianess_t
 __synctory_detect_endianess(void)
 {
-	uint16_t endiantest = 0x0001;
-	return (*(char *)&endiantest == 0x01) ? LITTLEENDIAN : BIGENDIAN;
+    uint16_t endiantest = 0x0001;
+    return (*(char *)&endiantest == 0x01) ? LITTLEENDIAN : BIGENDIAN;
 }
 
 
@@ -63,21 +63,21 @@ __synctory_detect_endianess(void)
 uint16_t
 __synctory_byteswap_16(uint16_t value)
 {
-	return (value << 8 | value >> 8);
+    return (value << 8 | value >> 8);
 }
 
 
 uint32_t
 __synctory_byteswap_32(uint32_t value)
 {
-	return ((value >> 24) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | (value << 24));
+    return ((value >> 24) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | (value << 24));
 }
 
 
 uint64_t
 __synctory_byteswap_64(uint64_t value)
 {
-	return ((value >> 56) | ((value >> 40) & (uint64_t)0xff00) | ((value >> 24) & (uint64_t)0xff0000) | ((value >> 8) & (uint64_t)0xff000000) | ((value << 8) & (uint64_t)0xff00000000) | ((value << 24) & (uint64_t)0xff0000000000) | ((value << 40) & (uint64_t)0xff000000000000) | (value << 56));
+    return ((value >> 56) | ((value >> 40) & (uint64_t)0xff00) | ((value >> 24) & (uint64_t)0xff0000) | ((value >> 8) & (uint64_t)0xff000000) | ((value << 8) & (uint64_t)0xff00000000) | ((value << 24) & (uint64_t)0xff0000000000) | ((value << 40) & (uint64_t)0xff000000000000) | (value << 56));
 }
 
 
@@ -87,10 +87,10 @@ __synctory_byteswap_64(uint64_t value)
 extern uint16_t
 synctory_hton16(uint16_t host16)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_16(host16);
-	else
-		return host16;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_16(host16);
+    else
+        return host16;
 }
 
 
@@ -100,10 +100,10 @@ synctory_hton16(uint16_t host16)
 extern uint32_t
 synctory_hton32(uint32_t host32)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_32(host32);
-	else
-		return host32;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_32(host32);
+    else
+        return host32;
 }
 
 
@@ -113,10 +113,10 @@ synctory_hton32(uint32_t host32)
 extern uint64_t
 synctory_hton64(uint64_t host64)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_64(host64);
-	else
-		return host64;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_64(host64);
+    else
+        return host64;
 }
 
 
@@ -126,10 +126,10 @@ synctory_hton64(uint64_t host64)
 extern uint16_t
 synctory_ntoh16(uint16_t net16)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_16(net16);
-	else
-		return net16;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_16(net16);
+    else
+        return net16;
 }
 
 
@@ -139,10 +139,10 @@ synctory_ntoh16(uint16_t net16)
 extern uint32_t
 synctory_ntoh32(uint32_t net32)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_32(net32);
-	else
-		return net32;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_32(net32);
+    else
+        return net32;
 }
 
 
@@ -152,8 +152,8 @@ synctory_ntoh32(uint32_t net32)
 extern uint64_t
 synctory_ntoh64(uint64_t net64)
 {
-	if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
-		return __synctory_byteswap_64(net64);
-	else
-		return net64;
+    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+        return __synctory_byteswap_64(net64);
+    else
+        return net64;
 }

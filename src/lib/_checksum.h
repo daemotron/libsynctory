@@ -29,8 +29,8 @@
  * @deprecated
  * Define available strong checksum algorithms
  */
-#define SYNCTORY_RIPEMD160 	0x10U
-#define SYNCTORY_SHA1 		0x20U
+#define SYNCTORY_RIPEMD160      0x10U
+#define SYNCTORY_SHA1           0x20U
 
 
 /**
@@ -60,24 +60,24 @@
  */
 typedef struct
 {
-	uint32_t count;		/* number of bytes included in checksum */
-	uint32_t s1;		/* part one of the sum */
-	uint32_t s2;		/* part two of the sum */
+    uint32_t count;     /* number of bytes included in checksum */
+    uint32_t s1;        /* part one of the sum */
+    uint32_t s2;        /* part two of the sum */
 } synctory_checksum_t;
 
 /**
  * Macro to  initialize the above-defined data type
  */
 #define synctory_checksum_init(sum) { \
-	(sum)->count=(sum)->s1=(sum)->s2=0; \
+    (sum)->count=(sum)->s1=(sum)->s2=0; \
 }
 
 /**
  * Macro to shift forward checksum by one byte
  */
 #define synctory_checksum_rotate(sum,out,in) { \
-	(sum)->s1 += (unsigned char)(in) - (unsigned char)(out); \
-	(sum)->s2 += (sum)->s1 - (sum)->count*((unsigned char)(out)+31); \
+    (sum)->s1 += (unsigned char)(in) - (unsigned char)(out); \
+    (sum)->s2 += (sum)->s1 - (sum)->count*((unsigned char)(out)+31); \
 }
 
 /**

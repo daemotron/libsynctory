@@ -46,72 +46,72 @@
 extern int
 synctory_synth_create_fd(int fdsource, int fddiff, int fddest)
 {
-	int rval = 0;
-	synctory_fheader_t header;
-	uint8_t type;
-	uint64_t index;
-	unsigned char ibuf[9];
-	synctory_off_t offset;
-	ssize_t rbytes;
-	
-	/* try to read header from diff file */
-	if ((rval = synctory_fh_getheader_fd(&header, fddiff)) != 0)
-		return rval;
-	
-	/* position diff file pointer at beginning of data section */
-	if ((offset = synctory_file64_seek(fddiff, SYNCTORY_FH_BYTES, SEEK_SET)) != SYNCTORY_FH_BYTES)
-		return errno;
-	
-	while ((rbytes = read(fddiff, ibuf, 9)) == 9)
-	{
-		type = *((uint8_t *)&ibuf[0]);
-		index = synctory_ntoh64(*((uint64_t *)&ibuf[1]));
-		
-		switch (type)
-		{
-			case SYNCTORY_DIFF_BTYPE_CHUNK:
-				synctory_file64_bytecopy(fdsource, fddest, index * header.chunksize, header.chunksize);
-				break;
-				
-			case SYNCTORY_DIFF_BTYPE_RAW:
-				synctory_file64_bytecopy(fddiff, fddest, synctory_file64_seek(fddiff, 0, SEEK_CUR), index);
-				break;
-				
-			default:
-				return -1;
-		}
-	}
-	
-	return rval;
+    int rval = 0;
+    synctory_fheader_t header;
+    uint8_t type;
+    uint64_t index;
+    unsigned char ibuf[9];
+    synctory_off_t offset;
+    ssize_t rbytes;
+    
+    /* try to read header from diff file */
+    if ((rval = synctory_fh_getheader_fd(&header, fddiff)) != 0)
+        return rval;
+    
+    /* position diff file pointer at beginning of data section */
+    if ((offset = synctory_file64_seek(fddiff, SYNCTORY_FH_BYTES, SEEK_SET)) != SYNCTORY_FH_BYTES)
+        return errno;
+    
+    while ((rbytes = read(fddiff, ibuf, 9)) == 9)
+    {
+        type = *((uint8_t *)&ibuf[0]);
+        index = synctory_ntoh64(*((uint64_t *)&ibuf[1]));
+        
+        switch (type)
+        {
+            case SYNCTORY_DIFF_BTYPE_CHUNK:
+                synctory_file64_bytecopy(fdsource, fddest, index * header.chunksize, header.chunksize);
+                break;
+                    
+            case SYNCTORY_DIFF_BTYPE_RAW:
+                synctory_file64_bytecopy(fddiff, fddest, synctory_file64_seek(fddiff, 0, SEEK_CUR), index);
+                break;
+                    
+            default:
+                return -1;
+        }
+    }
+    
+    return rval;
 }
 
 
 extern int
 synctory_synth_create_fn(const char *sourcefile, const char *difffile, const char *destfile)
 {
-	int rval = 0;
-	int fdsource, fddiff, fddest;
-	
-	/* open read-only file descriptor for source file */
-	fdsource = synctory_file64_open(sourcefile, O_RDONLY);
-	if (fdsource < 0)
-		return errno;
-	
-	/* open read-only file descriptor for diff file */
-	fddiff = synctory_file64_open(difffile, O_RDONLY);
-	if (fddiff < 0)
-		return errno;
-	
-	/* open write-only file descriptor for diff file */
-	fddest = synctory_file64_open(destfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fddest < 0)
-		return errno;
-	
-	rval = synctory_synth_create_fd(fdsource, fddiff, fddest);
-	
-	synctory_file64_close(fdsource);
-	synctory_file64_close(fddiff);
-	synctory_file64_close(fddest);
-	
-	return rval;
+    int rval = 0;
+    int fdsource, fddiff, fddest;
+    
+    /* open read-only file descriptor for source file */
+    fdsource = synctory_file64_open(sourcefile, O_RDONLY);
+    if (fdsource < 0)
+        return errno;
+    
+    /* open read-only file descriptor for diff file */
+    fddiff = synctory_file64_open(difffile, O_RDONLY);
+    if (fddiff < 0)
+        return errno;
+    
+    /* open write-only file descriptor for diff file */
+    fddest = synctory_file64_open(destfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fddest < 0)
+        return errno;
+    
+    rval = synctory_synth_create_fd(fdsource, fddiff, fddest);
+    
+    synctory_file64_close(fdsource);
+    synctory_file64_close(fddiff);
+    synctory_file64_close(fddest);
+    
+    return rval;
 }

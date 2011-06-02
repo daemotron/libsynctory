@@ -34,11 +34,12 @@
 #ifndef __LIBSYNCTORY_FILE64_H
 #define __LIBSYNCTORY_FILE64_H
 
-/*	NOTE
-	unistd.h provides the seek whence flags. This include is just for
-	convenience, granting the seek function to work properly even when
-	unistd.h is not explicitly included.
-*/
+/*
+ * NOTE
+ * unistd.h provides the seek whence flags. This include is just for
+ * convenience, granting the seek function to work properly even when
+ * unistd.h is not explicitly included.
+ */
 #include <unistd.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -51,8 +52,11 @@
 /*
  * FIXME
  * 
- * This is bullshit; it doesn't work in FBSD/AMD64
- * => kill that glibc-related fuckup
+ * The following piece of code is devoted to the abysmal mystery
+ * of glibc (as is this whole module, coming to think of it).
+ * 
+ * Please, if anyone knows how to get rid of this nauseant,
+ * submit a patch!
  */
 
 #if (defined HAVE_STAT_R) && (!defined HAVE_STAT64_R)

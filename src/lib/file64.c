@@ -32,22 +32,23 @@
  */
 
 /*
-	The purpose of this module is to provide a generic interface to file
-	operations such as open, close, write, read, seek with granted
-	64 bit pointers, allowing to operate on files larger than 2 GiB.
-	
-	Since these 64 bit wrapper functions are not available on all operating
-	systems, it became necessary to write this library.
-*/
+ * The purpose of this module is to provide a generic interface to file
+ * operations such as open, close, write, read, seek with granted
+ * 64 bit pointers, allowing to operate on files larger than 2 GiB.
+ * 
+ * Since these 64 bit wrapper functions are not available on all operating
+ * systems, it became necessary to write this library.
+ */
 
 
 #include <sys/types.h>
-/*	WARNING
-	This is a dirty hack to get lstat() even on systems with glibc.
-	lstat() is only defined there when __USE_XOPEN2K is defined.
-	This is done here, together with a mechanism to unset __USE_XOPEN2K
-	if it hadn't been defined in the first place.
-*/
+/*
+ * WARNING
+ * This is a dirty hack to get lstat() even on systems with glibc.
+ * lstat() is only defined there when __USE_XOPEN2K is defined.
+ * This is done here, together with a mechanism to unset __USE_XOPEN2K
+ * if it hadn't been defined in the first place.
+ */
 #ifndef __USE_XOPEN2K
 #define __USE_XOPEN2K
 #define __BY_XOPEN2K_UNSET
@@ -69,41 +70,41 @@
 extern int
 synctory_file64_open(const char *path, int oflag, ...)
 {
-	va_list vargptr;
-	mode_t mode;
+    va_list vargptr;
+    mode_t mode;
 
 #ifdef HAVE_LARGEFILE_S
-	oflag |= O_LARGEFILE;
+    oflag |= O_LARGEFILE;
 #endif
 
-	if ((O_CREAT & oflag) == O_CREAT)
-	{
-		va_start(vargptr, oflag);
+    if ((O_CREAT & oflag) == O_CREAT)
+    {
+        va_start(vargptr, oflag);
 #ifdef __FreeBSD__
-                mode = va_arg(vargptr, int);
+        mode = va_arg(vargptr, int);
 #else
-		mode = va_arg(vargptr, mode_t);
+        mode = va_arg(vargptr, mode_t);
 #endif
-		va_end(vargptr);
+        va_end(vargptr);
 #if (OFFT_SIZE == 8) || ((OFFT_SIZE == 4) && (!defined HAVE_OPEN64_F) && (defined HAVE_LARGEFILE_S))
-		return open(path, oflag, mode);
+        return open(path, oflag, mode);
 #elif (OFFT_SIZE == 4) && (defined HAVE_OPEN64_F)
-		return open64(path, oflag, mode);
+        return open64(path, oflag, mode);
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
-	}
-	else
-	{
+    }
+    else
+    {
 #if (OFFT_SIZE == 8) || ((OFFT_SIZE == 4) && (!defined HAVE_OPEN64_F) && (defined HAVE_LARGEFILE_S))
-		return open(path, oflag);
+        return open(path, oflag);
 #elif (OFFT_SIZE == 4) && (defined HAVE_OPEN64_F)
-		return open64(path, oflag);
+        return open64(path, oflag);
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
-	}
-	return 0;
+    }
+    return 0;
 }
 
 
@@ -135,7 +136,7 @@ _synctory_file64_get_fd(int *flag, int fd, const char *path, char mode)
 extern int
 synctory_file64_close(int fd)
 {
-	return close(fd);
+    return close(fd);
 }
 
 
@@ -143,13 +144,13 @@ extern synctory_off_t
 synctory_file64_seek(int fd, int64_t offset, int whence)
 {
 #if (OFFT_SIZE == 8) || ((OFFT_SIZE == 4) && (!defined HAVE_LSEEK64_F) && (defined HAVE_LARGEFILE_S))
-	return (synctory_off_t)lseek(fd, (off_t)offset, whence);
+    return (synctory_off_t)lseek(fd, (off_t)offset, whence);
 #elif (OFFT_SIZE == 4) && (defined HAVE_LSEEK64_F) && (defined OFF64T_SIZE)
-	return (synctory_off_t)lseek64(fd, (off64_t)offset, whence);
+    return (synctory_off_t)lseek64(fd, (off64_t)offset, whence);
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
-	return 0;
+    return 0;
 }
 
 
@@ -157,9 +158,9 @@ extern int
 synctory_file64_lstat(const char *file, synctory_file64_stat_t *buf)
 {
 #if (defined HAVE_LSTAT64_F) && (defined HAVE_STAT64_R)
-	return lstat64(file, buf);
+    return lstat64(file, buf);
 #else
-	return lstat(file, buf);
+    return lstat(file, buf);
 #endif
 }
 
@@ -167,25 +168,25 @@ synctory_file64_lstat(const char *file, synctory_file64_stat_t *buf)
 extern synctory_off_t
 synctory_file64_bytecopy(int fdsource, int fddest, synctory_off_t offset, synctory_off_t bytes)
 {
-	int rval = 0;
-	unsigned char buffer[SYNCTORY_FILE64_BUFSIZE];
-	synctory_off_t position;
-	
-	/* seek to the start position of the source */
-	if (offset != synctory_file64_seek(fdsource, offset, SEEK_SET))
-		return errno;
-	
-	/* transfer raw bytes to diff file */
-	for (position = 0; position < (bytes / SYNCTORY_FILE64_BUFSIZE); position++)
-	{
-		read(fdsource, buffer, SYNCTORY_FILE64_BUFSIZE);
-		rval += write(fddest, buffer, SYNCTORY_FILE64_BUFSIZE);
-	}
-	if ((bytes % SYNCTORY_FILE64_BUFSIZE) != 0)
-	{
-		read(fdsource, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
-		rval += write(fddest, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
-	}
-	
-	return rval;
+    int rval = 0;
+    unsigned char buffer[SYNCTORY_FILE64_BUFSIZE];
+    synctory_off_t position;
+    
+    /* seek to the start position of the source */
+    if (offset != synctory_file64_seek(fdsource, offset, SEEK_SET))
+        return errno;
+    
+    /* transfer raw bytes to diff file */
+    for (position = 0; position < (bytes / SYNCTORY_FILE64_BUFSIZE); position++)
+    {
+        read(fdsource, buffer, SYNCTORY_FILE64_BUFSIZE);
+        rval += write(fddest, buffer, SYNCTORY_FILE64_BUFSIZE);
+    }
+    if ((bytes % SYNCTORY_FILE64_BUFSIZE) != 0)
+    {
+        read(fdsource, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
+        rval += write(fddest, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
+    }
+    
+    return rval;
 }

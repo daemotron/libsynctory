@@ -65,11 +65,11 @@
  */
 typedef struct
 {
-	uint8_t type;
-	uint64_t version;
-	uint64_t filesize;
-	uint16_t chunksize;
-	uint8_t algo;
+    uint8_t type;
+    uint64_t version;
+    uint64_t filesize;
+    uint16_t chunksize;
+    uint8_t algo;
 } synctory_fheader_t;
 
 

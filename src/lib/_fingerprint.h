@@ -63,18 +63,18 @@
  */
 typedef struct
 {
-	synctory_off_t offset;
-	uint16_t chunksize;
-	uint8_t algo;
+    synctory_off_t offset;
+    uint16_t chunksize;
+    uint8_t algo;
 } synctory_fingerprint_iterctx_t;
 
 /**
  * Macro to initialize the above-defined structural data type
  */
 #define synctory_fingerprint_iterctx_init(ctx,csize) { \
-	(ctx)->offset=0; \
-	(ctx)->chunksize=(csize); \
-	(ctx)->algo=SYNCTORY_CHECKSUM_DEFAULT; \
+    (ctx)->offset=0; \
+    (ctx)->chunksize=(csize); \
+    (ctx)->algo=SYNCTORY_CHECKSUM_DEFAULT; \
 }
 
 extern int synctory_fingerprint_fetchheader_fd(int fd, synctory_fheader_t *header);

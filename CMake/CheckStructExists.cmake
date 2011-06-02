@@ -16,26 +16,26 @@
 include(CheckCSourceCompiles)
 
 macro(CHECK_STRUCT_EXISTS STRUCT FILES VARIABLE)
-	message(STATUS "Looking for ${STRUCT}")
-	set(_INCLUDE_FILES)
-	foreach(it ${FILES})
-		set(_INCLUDE_FILES "${_INCLUDE_FILES}#include <${it}>\n")
-	endforeach(it)
-	
-	set(_CHECK_STRUCT_EXISTS_CODE "
+    message(STATUS "Looking for ${STRUCT}")
+    set(_INCLUDE_FILES)
+    foreach(it ${FILES})
+        set(_INCLUDE_FILES "${_INCLUDE_FILES}#include <${it}>\n")
+    endforeach(it)
+    
+    set(_CHECK_STRUCT_EXISTS_CODE "
 ${_INCLUDE_FILES}
 int main(void)
 {
-	int size;
-	static ${STRUCT} tmp;
-	size = sizeof(tmp);
-	return 0;
+    int size;
+    static ${STRUCT} tmp;
+    size = sizeof(tmp);
+    return 0;
 }
 ")
-	check_c_source_compiles("${_CHECK_STRUCT_EXISTS_CODE}" ${VARIABLE})
-	if(${VARIABLE})
-		MESSAGE(STATUS "Looking for ${STRUCT} - found")
-	else(${VARIABLE})
-		MESSAGE(STATUS "Looking for ${STRUCT} - not found.")
-	endif(${VARIABLE})
+    check_c_source_compiles("${_CHECK_STRUCT_EXISTS_CODE}" ${VARIABLE})
+    if(${VARIABLE})
+        MESSAGE(STATUS "Looking for ${STRUCT} - found")
+    else(${VARIABLE})
+        MESSAGE(STATUS "Looking for ${STRUCT} - not found.")
+    endif(${VARIABLE})
 endmacro(CHECK_STRUCT_EXISTS)
