@@ -1,35 +1,19 @@
-/**
- * Copyright (c) 2010 Jesco Freund.
- * All rights reserved.
+/*-
+ * Copyright (c) 2010, 2011 Daemotron <mail@daemotron.net>
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of Backtory nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *  $Id$
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 
 #ifndef __LIBSYNCTORY_CHECKSUM_H_
 #define __LIBSYNCTORY_CHECKSUM_H_
@@ -42,6 +26,7 @@
 
 
 /**
+ * @deprecated
  * Define available strong checksum algorithms
  */
 #define SYNCTORY_RIPEMD160 	0x10U
@@ -49,11 +34,13 @@
 
 
 /**
+ * @deprecated
  * set the default checksum algorithm
  */
 #define SYNCTORY_CHECKSUM_DEFAULT SYNCTORY_RIPEMD160
 
 /** 
+ * @deprecated
  * size of the strong checksum result in bits.
  * The currently used RIPEMD-160 algorithm produces
  * a 160 bit long checksum 
@@ -63,6 +50,7 @@
 
 
 /**
+ * @deprecated
  * Dummy macro to return correct size of a strong checksum
  */
 #define synctory_strong_checksum_size(algo) SYNCTORY_STRONG_CHECKSUM_BYTES
@@ -103,5 +91,6 @@ extern int synctory_strong_checksum(void const *stream, size_t len, unsigned cha
 extern int synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result);
 extern int synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result);
 extern int synctory_strong_checksum_compare(const unsigned char *cs1, const unsigned char *cs2, size_t len);
+extern int synctory_strong_checksum_destbufsize(uint8_t algo);
 
 #endif /* __LIBSYNCTORY_CHECKSUM_H_ */

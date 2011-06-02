@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2011 Daemotron <mail@daemotron.net>
+ * Copyright (c) 2010, 2011 Daemotron <mail@daemotron.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -90,6 +90,16 @@ extern size_t synctory_version_bytes(void);
 
 
 /**
+ * Initialize synctory context object.
+ * 
+ * The context properties are filled with default values set at compile
+ * time for libsynctory. After initialization, some properties of the
+ * context object can be changed to meet specific needs.
+ */
+extern void synctory_ctx_init(synctory_ctx_t *ctx);
+
+
+/**
  * Create fingerprint from source file and store it in destination file.
  * 
  * As arguments, this function takes the source and destination file. Both
@@ -104,7 +114,7 @@ extern size_t synctory_version_bytes(void);
  * To skip one form of indication, simply provide a NULL pointer for path names,
  * or a negative integer (usually -1) for the file descriptor.
  */
-extern int synctory_fingerprint_create(int source_fd, int dest_fd, const char *source_file, const char *dest_file);
+extern int synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file);
 
 
 #endif /* __LIBSYNCTORY_SYNCTORY_H */

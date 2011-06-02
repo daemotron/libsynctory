@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include "version.h"
+#include "default.h"
 
 #include "_file64.h"
 #include "_fingerprint.h"
@@ -52,8 +53,16 @@ synctory_version(uint64_t *num, void *buffer, size_t len)
 }
 
 
+extern void
+synctory_ctx_init(synctory_ctx_t *ctx)
+{
+    ctx->checksum_algorithm = SYNCTORY_DEFAULT_CHECKSUM;
+    ctx->chunk_size = SYNCTORY_DEFAULT_CHUNKSIZE;
+}
+
+
 extern int
-synctory_fingerprint_create(int source_fd, int dest_fd, const char *source_file, const char *dest_file)
+synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file)
 {
     /* sfd = source file descriptor, dfd = destination file descriptor */
     int sfd = 0;
@@ -64,7 +73,7 @@ synctory_fingerprint_create(int source_fd, int dest_fd, const char *source_file,
     sfd = _synctory_file64_get_fd(&flag[0], source_fd, source_file, 'r');
     dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
     
-    rval = synctory_fingerprint_create_fd(sfd, dfd);
+    rval = synctory_fingerprint_create_fd(ctx, sfd, dfd);
     
     if (flag[0])
         synctory_file64_close(sfd);
