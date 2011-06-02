@@ -117,4 +117,31 @@ extern void synctory_ctx_init(synctory_ctx_t *ctx);
 extern int synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file);
 
 
+/**
+ * Create a diff file based on a fingerprint and a source file.
+ * 
+ * The diff represents the difference between a file f1 and another file f2.
+ * f1 is actually neither known nor available, only its fingerprint is required
+ * to calculate the difference between f1 and f2. f2 however must be known and
+ * present.
+ * 
+ * This function takes three arguments:
+ * 
+ *   source file => path or descriptor of file f2
+ *   fingerprint => path or descriptor of fingerprint from f1
+ *   destination => path or descriptor to store the diff result to
+ *
+ * All arguments can be provided either as file descriptor or as path string. The 
+ * file descriptor has a higher priority, i. e. if both file descriptor and path
+ * name are provided, only the file descriptor will be used; the pathname
+ * is ignored in this case.
+ * 
+ * It is possible to indicate mixed arguments, e. g. indicate the source file
+ * as path name and the destination file as file descriptor.
+ * 
+ * To skip one form of indication, simply provide a NULL pointer for path names,
+ * or a negative integer (usually -1) for the file descriptor.
+ */
+extern int synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file);
+
 #endif /* __LIBSYNCTORY_SYNCTORY_H */

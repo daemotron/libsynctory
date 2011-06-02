@@ -1,5 +1,5 @@
 # install header files
 install(
-	FILES diff.h fingerprint.h synth.h version.h
+	FILES synth.h
 	DESTINATION include/libsynctory
 )
