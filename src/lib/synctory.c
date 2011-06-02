@@ -29,6 +29,7 @@
 #include "_file64.h"
 #include "_fingerprint.h"
 #include "_diff.h"
+#include "_synth.h"
 
 
 extern size_t
@@ -100,6 +101,33 @@ synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, const char 
     ffd = _synctory_file64_get_fd(&flag[0], fingerprint_fd, fingerprint_file, 'r');
     
     rval = synctory_diff_create_fd(ffd, sfd, dfd);
+    
+    if (flag[0])
+        synctory_file64_close(sfd);
+    if (flag[1])
+        synctory_file64_close(dfd);
+    if (flag[2])
+        synctory_file64_close(ffd);
+
+    return rval;
+}
+
+
+extern int
+synctory_synth_create(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file)
+{
+    /* sfd = source file descriptor, dfd = destination file descriptor */
+    int sfd = 0;
+    int dfd = 0;
+    int ffd = 0;
+    int flag[3] = {0, 0, 0};
+    int rval = 0;
+    
+    sfd = _synctory_file64_get_fd(&flag[0], source_fd, source_file, 'r');
+    dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
+    ffd = _synctory_file64_get_fd(&flag[0], diff_fd, diff_file, 'r');
+    
+    rval = synctory_synth_create_fd(sfd, ffd, dfd);
     
     if (flag[0])
         synctory_file64_close(sfd);

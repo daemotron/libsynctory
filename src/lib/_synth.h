@@ -34,6 +34,19 @@
 #ifndef __LIBSYNCTORY_SYNTH_H_
 #define __LIBSYNCTORY_SYNTH_H_
 
-#include <libsynctory/synth.h>
+/**
+ * Synthesize recent file from the original file (sourcefile) and
+ * the binary difference (diffile) between both. Store the result in
+ * the file named destfile.
+ */
+extern int synctory_synth_create_fn(const char *sourcefile, const char *difffile, const char *destfile);
+
+/**
+ * Synthesize recent file from the original file (accessed via the fdsource
+ * file descriptor) and the binary difference (accessed via the fddiff file
+ * descriptor) between both. Store the result in the file designated by the
+ * fddest file descriptor.
+ */
+extern int synctory_synth_create_fd(int fdsource, int fddiff, int fddest);
 
 #endif /* __LIBSYNCTORY_SYNTH_H_ */
