@@ -17,4 +17,7 @@
 add_subdirectory(config)
 add_subdirectory(include)
 add_subdirectory(lib)
-#add_subdirectory(test)
+
+if (WITH_TEST)
+    add_subdirectory(test)
+endif(WITH_TEST)
