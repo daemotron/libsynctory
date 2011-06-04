@@ -67,8 +67,8 @@
 #include "config.h"
 #include "_file64.h"
 
-extern int
-synctory_file64_open(const char *path, int oflag, ...)
+int
+_synctory_file64_open(const char *path, int oflag, ...)
 {
     va_list vargptr;
     mode_t mode;
@@ -124,29 +124,29 @@ _synctory_file64_get_fd(int *flag, int fd, const char *path, char mode)
         {
             *flag = 1;
             if ('r' == mode)
-                return synctory_file64_open(path, O_RDONLY);
+                return _synctory_file64_open(path, O_RDONLY);
             else if ('w' == mode)
-                return synctory_file64_open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                return _synctory_file64_open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             else
                 return -1;
         }
     }
 }
 
-extern int
-synctory_file64_close(int fd)
+int
+_synctory_file64_close(int fd)
 {
     return close(fd);
 }
 
 
-extern synctory_off_t
-synctory_file64_seek(int fd, int64_t offset, int whence)
+_synctory_off_t
+_synctory_file64_seek(int fd, int64_t offset, int whence)
 {
 #if (OFFT_SIZE == 8) || ((OFFT_SIZE == 4) && (!defined HAVE_LSEEK64_F) && (defined HAVE_LARGEFILE_S))
-    return (synctory_off_t)lseek(fd, (off_t)offset, whence);
+    return (_synctory_off_t)lseek(fd, (off_t)offset, whence);
 #elif (OFFT_SIZE == 4) && (defined HAVE_LSEEK64_F) && (defined OFF64T_SIZE)
-    return (synctory_off_t)lseek64(fd, (off64_t)offset, whence);
+    return (_synctory_off_t)lseek64(fd, (off64_t)offset, whence);
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
@@ -154,8 +154,8 @@ synctory_file64_seek(int fd, int64_t offset, int whence)
 }
 
 
-extern int
-synctory_file64_lstat(const char *file, synctory_file64_stat_t *buf)
+int
+_synctory_file64_lstat(const char *file, _synctory_file64_stat_t *buf)
 {
 #if (defined HAVE_LSTAT64_F) && (defined HAVE_STAT64_R)
     return lstat64(file, buf);
@@ -165,27 +165,27 @@ synctory_file64_lstat(const char *file, synctory_file64_stat_t *buf)
 }
 
 
-extern synctory_off_t
-synctory_file64_bytecopy(int fdsource, int fddest, synctory_off_t offset, synctory_off_t bytes)
+_synctory_off_t
+_synctory_file64_bytecopy(int fdsource, int fddest, _synctory_off_t offset, _synctory_off_t bytes)
 {
     int rval = 0;
-    unsigned char buffer[SYNCTORY_FILE64_BUFSIZE];
-    synctory_off_t position;
+    unsigned char buffer[_SYNCTORY_FILE64_BUFSIZE];
+    _synctory_off_t position;
     
     /* seek to the start position of the source */
-    if (offset != synctory_file64_seek(fdsource, offset, SEEK_SET))
+    if (offset != _synctory_file64_seek(fdsource, offset, SEEK_SET))
         return errno;
     
     /* transfer raw bytes to diff file */
-    for (position = 0; position < (bytes / SYNCTORY_FILE64_BUFSIZE); position++)
+    for (position = 0; position < (bytes / _SYNCTORY_FILE64_BUFSIZE); position++)
     {
-        read(fdsource, buffer, SYNCTORY_FILE64_BUFSIZE);
-        rval += write(fddest, buffer, SYNCTORY_FILE64_BUFSIZE);
+        read(fdsource, buffer, _SYNCTORY_FILE64_BUFSIZE);
+        rval += write(fddest, buffer, _SYNCTORY_FILE64_BUFSIZE);
     }
-    if ((bytes % SYNCTORY_FILE64_BUFSIZE) != 0)
+    if ((bytes % _SYNCTORY_FILE64_BUFSIZE) != 0)
     {
-        read(fdsource, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
-        rval += write(fddest, buffer, bytes % SYNCTORY_FILE64_BUFSIZE);
+        read(fdsource, buffer, bytes % _SYNCTORY_FILE64_BUFSIZE);
+        rval += write(fddest, buffer, bytes % _SYNCTORY_FILE64_BUFSIZE);
     }
     
     return rval;

@@ -39,7 +39,7 @@
  * the binary difference (diffile) between both. Store the result in
  * the file named destfile.
  */
-extern int synctory_synth_create_fn(const char *sourcefile, const char *difffile, const char *destfile);
+int _synctory_synth_create_fn(const char *sourcefile, const char *difffile, const char *destfile);
 
 /**
  * Synthesize recent file from the original file (accessed via the fdsource
@@ -47,6 +47,6 @@ extern int synctory_synth_create_fn(const char *sourcefile, const char *difffile
  * descriptor) between both. Store the result in the file designated by the
  * fddest file descriptor.
  */
-extern int synctory_synth_create_fd(int fdsource, int fddiff, int fddest);
+int _synctory_synth_create_fd(int fdsource, int fddiff, int fddest);
 
 #endif /* __LIBSYNCTORY_SYNTH_H_ */

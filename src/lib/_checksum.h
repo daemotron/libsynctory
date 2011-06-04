@@ -18,42 +18,14 @@
 #ifndef __LIBSYNCTORY_CHECKSUM_H_
 #define __LIBSYNCTORY_CHECKSUM_H_
 
+#include <synctory.h>
+
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <openssl/ripemd.h>
 
-
-/**
- * @deprecated
- * Define available strong checksum algorithms
- */
-#define SYNCTORY_RIPEMD160      0x10U
-#define SYNCTORY_SHA1           0x20U
-
-
-/**
- * @deprecated
- * set the default checksum algorithm
- */
-#define SYNCTORY_CHECKSUM_DEFAULT SYNCTORY_RIPEMD160
-
-/** 
- * @deprecated
- * size of the strong checksum result in bits.
- * The currently used RIPEMD-160 algorithm produces
- * a 160 bit long checksum 
- */
-#define SYNCTORY_STRONG_CHECKSUM_BYTES RIPEMD160_DIGEST_LENGTH
-#define SYNCTORY_STRONG_CHECKSUM_BITS SYNCTORY_STRONG_CHECKSUM_BYTES * CHAR_BIT
-
-
-/**
- * @deprecated
- * Dummy macro to return correct size of a strong checksum
- */
-#define synctory_strong_checksum_size(algo) SYNCTORY_STRONG_CHECKSUM_BYTES
 
 /**
  * Data type for the rolling weak checksum
@@ -63,19 +35,19 @@ typedef struct
     uint32_t count;     /* number of bytes included in checksum */
     uint32_t s1;        /* part one of the sum */
     uint32_t s2;        /* part two of the sum */
-} synctory_checksum_t;
+} _synctory_checksum_t;
 
 /**
  * Macro to  initialize the above-defined data type
  */
-#define synctory_checksum_init(sum) { \
+#define _synctory_checksum_init(sum) { \
     (sum)->count=(sum)->s1=(sum)->s2=0; \
 }
 
 /**
  * Macro to shift forward checksum by one byte
  */
-#define synctory_checksum_rotate(sum,out,in) { \
+#define _synctory_checksum_rotate(sum,out,in) { \
     (sum)->s1 += (unsigned char)(in) - (unsigned char)(out); \
     (sum)->s2 += (sum)->s1 - (sum)->count*((unsigned char)(out)+31); \
 }
@@ -83,14 +55,14 @@ typedef struct
 /**
  * Macro to calculate checksum digest from checksum structure
  */
-#define synctory_checksum_digest(sum) (((sum)->s2 << 16) | ((sum)->s1 & 0xffff))
+#define _synctory_checksum_digest(sum) (((sum)->s2 << 16) | ((sum)->s1 & 0xffff))
 
-extern uint32_t synctory_weak_checksum(void const *stream, size_t len);
-extern int synctory_checksum_update(synctory_checksum_t *checksum, void const *stream, size_t len);
-extern int synctory_strong_checksum(void const *stream, size_t len, unsigned char *result, uint8_t algo);
-extern int synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result);
-extern int synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result);
-extern int synctory_strong_checksum_compare(const unsigned char *cs1, const unsigned char *cs2, size_t len);
-extern int synctory_strong_checksum_destbufsize(uint8_t algo);
+uint32_t _synctory_weak_checksum(void const *stream, size_t len);
+int _synctory_checksum_update(_synctory_checksum_t *checksum, void const *stream, size_t len);
+int _synctory_strong_checksum(void const *stream, size_t len, unsigned char *result, synctory_algo_t algo);
+int _synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result);
+int _synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result);
+int _synctory_strong_checksum_compare(const unsigned char *cs1, const unsigned char *cs2, size_t len);
+int _synctory_strong_checksum_size(synctory_algo_t algo);
 
 #endif /* __LIBSYNCTORY_CHECKSUM_H_ */

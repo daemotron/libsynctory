@@ -43,7 +43,7 @@ extern void
 synctory_version(uint64_t *num, void *buffer, size_t len)
 {
     if (NULL != num)
-        *num = LIBSYNCTORY_VERSION_NUM;
+        *num = _SYNCTORY_VERSION_NUM;
     
     if (NULL != buffer)
     {
@@ -58,8 +58,8 @@ synctory_version(uint64_t *num, void *buffer, size_t len)
 extern void
 synctory_init(synctory_ctx_t *ctx)
 {
-    ctx->checksum_algorithm = SYNCTORY_DEFAULT_CHECKSUM;
-    ctx->chunk_size = SYNCTORY_DEFAULT_CHUNKSIZE;
+    ctx->checksum_algorithm = _SYNCTORY_DEFAULT_CHECKSUM;
+    ctx->chunk_size = _SYNCTORY_DEFAULT_CHUNKSIZE;
 }
 
 
@@ -75,12 +75,12 @@ synctory_fingerprint(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char
     sfd = _synctory_file64_get_fd(&flag[0], source_fd, source_file, 'r');
     dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
     
-    rval = synctory_fingerprint_create_fd(ctx, sfd, dfd);
+    rval = _synctory_fingerprint_create_fd(ctx, sfd, dfd);
     
     if (flag[0])
-        synctory_file64_close(sfd);
+        _synctory_file64_close(sfd);
     if (flag[1])
-        synctory_file64_close(dfd);
+        _synctory_file64_close(dfd);
 
     return rval;
 }
@@ -100,14 +100,14 @@ synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const char *source
     dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
     ffd = _synctory_file64_get_fd(&flag[0], fingerprint_fd, fingerprint_file, 'r');
     
-    rval = synctory_diff_create_fd(ffd, sfd, dfd);
+    rval = _synctory_diff_create_fd(ffd, sfd, dfd);
     
     if (flag[0])
-        synctory_file64_close(sfd);
+        _synctory_file64_close(sfd);
     if (flag[1])
-        synctory_file64_close(dfd);
+        _synctory_file64_close(dfd);
     if (flag[2])
-        synctory_file64_close(ffd);
+        _synctory_file64_close(ffd);
 
     return rval;
 }
@@ -127,14 +127,14 @@ synctory_synth(int source_fd, int dest_fd, int diff_fd, const char *source_file,
     dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
     ffd = _synctory_file64_get_fd(&flag[0], diff_fd, diff_file, 'r');
     
-    rval = synctory_synth_create_fd(sfd, ffd, dfd);
+    rval = _synctory_synth_create_fd(sfd, ffd, dfd);
     
     if (flag[0])
-        synctory_file64_close(sfd);
+        _synctory_file64_close(sfd);
     if (flag[1])
-        synctory_file64_close(dfd);
+        _synctory_file64_close(dfd);
     if (flag[2])
-        synctory_file64_close(ffd);
+        _synctory_file64_close(ffd);
 
     return rval;
 }

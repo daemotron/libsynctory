@@ -41,8 +41,8 @@
  * uint64_t) would extend this range, but also entail a loss in performance
  * and increase the memory footprint.
  */
-extern uint32_t
-synctory_weak_checksum(void const *stream, size_t len)
+uint32_t
+_synctory_weak_checksum(void const *stream, size_t len)
 {
     int i;
     uint32_t a = 0, b = 0;
@@ -89,8 +89,8 @@ synctory_weak_checksum(void const *stream, size_t len)
 #define SYNCTORY_CHECKSUM_STEP16(buffer)   	SYNCTORY_CHECKSUM_STEP8(buffer,0); SYNCTORY_CHECKSUM_STEP8(buffer,8);
 #define SYNCTORY_CHECKSUM_OFFS16(off)  		{a += 16*off; b += 136*off;}
 
-extern int
-synctory_checksum_update(synctory_checksum_t *checksum, void const *stream, size_t len)
+int
+_synctory_checksum_update(_synctory_checksum_t *checksum, void const *stream, size_t len)
 {
     uint32_t a = checksum->s1;
     uint32_t b = checksum->s2;
@@ -121,8 +121,8 @@ synctory_checksum_update(synctory_checksum_t *checksum, void const *stream, size
 }
 
 
-extern int
-synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result)
+int
+_synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result)
 {
     if (NULL == RIPEMD160((unsigned char const *)stream, len, result))
         return ERR_get_error();
@@ -130,8 +130,8 @@ synctory_rmd160_checksum(void const *stream, size_t len, unsigned char *result)
 }
 
 
-extern int
-synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result)
+int
+_synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result)
 {
     if (NULL == SHA1((unsigned char const *)stream, len, result))
         return ERR_get_error();
@@ -139,15 +139,15 @@ synctory_sha1_checksum(void const *stream, size_t len, unsigned char *result)
 }
 
 
-extern int 
-synctory_strong_checksum_destbufsize(uint8_t algo)
+int 
+_synctory_strong_checksum_size(synctory_algo_t algo)
 {
     switch (algo)
     {
-        case synctory_strchk_rmd160:
+        case synctory_algo_rmd160:
             return RIPEMD160_DIGEST_LENGTH;
             break;
-        case synctory_strchk_sha1:
+        case synctory_algo_sha1:
             return SHA_DIGEST_LENGTH;
         default:
             return -1;
@@ -164,16 +164,16 @@ synctory_strong_checksum_destbufsize(uint8_t algo)
  * a buffer with a length of SYNCTORY_STRONG_CHECKSUM_BYTES has to be
  * provided to this function so it can save the result to this buffer.
  */
-extern int
-synctory_strong_checksum(void const *stream, size_t len, unsigned char *result, uint8_t algo)
+int
+_synctory_strong_checksum(void const *stream, size_t len, unsigned char *result, synctory_algo_t algo)
 {
     switch (algo)
     {
-        case SYNCTORY_RIPEMD160:
-            return synctory_rmd160_checksum(stream, len, result);
+        case synctory_algo_rmd160:
+            return _synctory_rmd160_checksum(stream, len, result);
             break;
-        case SYNCTORY_SHA1:
-            return synctory_sha1_checksum(stream, len, result);
+        case synctory_algo_sha1:
+            return _synctory_sha1_checksum(stream, len, result);
             break;
         default:
             return -1;
@@ -184,8 +184,8 @@ synctory_strong_checksum(void const *stream, size_t len, unsigned char *result, 
 /**
  * Compare two strong checksums
  */
-extern int
-synctory_strong_checksum_compare(const unsigned char *cs1, const unsigned char *cs2, size_t len)
+int
+_synctory_strong_checksum_compare(const unsigned char *cs1, const unsigned char *cs2, size_t len)
 {
     int i;
     for (i = 0; i < (int)len; ++i)

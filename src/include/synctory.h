@@ -15,8 +15,8 @@
  */
 
 
-#ifndef __LIBSYNCTORY_SYNCTORY_H
-#define __LIBSYNCTORY_SYNCTORY_H
+#ifndef __LIBSYNCTORY_H
+#define __LIBSYNCTORY_H
 
 
 #include <stddef.h>
@@ -33,9 +33,9 @@
  */
 typedef enum
 {
-    synctory_strchk_rmd160      = 0x10,
-    synctory_strchk_sha1        = 0x20
-} synctory_checksum_algo_t;
+    synctory_algo_rmd160      = 0x10,
+    synctory_algo_sha1        = 0x20
+} synctory_algo_t;
 
 
 /**
@@ -58,7 +58,7 @@ typedef enum
 typedef struct
 {
     uint16_t chunk_size;
-    synctory_checksum_algo_t checksum_algorithm;
+    synctory_algo_t checksum_algorithm;
 } synctory_ctx_t;
 
 
@@ -171,4 +171,4 @@ extern int synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const c
  */
 extern int synctory_synth(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file);
 
-#endif /* __LIBSYNCTORY_SYNCTORY_H */
+#endif /* __LIBSYNCTORY_H */

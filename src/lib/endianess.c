@@ -41,7 +41,7 @@
  * well on little and big endian systems, chances are high it will tell utter rubbish
  * when released on middle or bi-endian systems.
  */
-synctory_endianess_t
+_synctory_endianess_t
 __synctory_detect_endianess(void)
 {
     uint16_t endiantest = 0x0001;
@@ -60,21 +60,21 @@ __synctory_detect_endianess(void)
  * (meaning: on all platforms), and inversion for 64 bit integers isn't even
  * part of some standard, so it would be unwise to rely on the libc.
  */
-uint16_t
+static uint16_t
 __synctory_byteswap_16(uint16_t value)
 {
     return (value << 8 | value >> 8);
 }
 
 
-uint32_t
+static uint32_t
 __synctory_byteswap_32(uint32_t value)
 {
     return ((value >> 24) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | (value << 24));
 }
 
 
-uint64_t
+static uint64_t
 __synctory_byteswap_64(uint64_t value)
 {
     return ((value >> 56) | ((value >> 40) & (uint64_t)0xff00) | ((value >> 24) & (uint64_t)0xff0000) | ((value >> 8) & (uint64_t)0xff000000) | ((value << 8) & (uint64_t)0xff00000000) | ((value << 24) & (uint64_t)0xff0000000000) | ((value << 40) & (uint64_t)0xff000000000000) | (value << 56));
@@ -84,10 +84,10 @@ __synctory_byteswap_64(uint64_t value)
 /**
  * This function implements hton for uint16_t values
  */
-extern uint16_t
-synctory_hton16(uint16_t host16)
+uint16_t
+_synctory_hton16(uint16_t host16)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_16(host16);
     else
         return host16;
@@ -97,10 +97,10 @@ synctory_hton16(uint16_t host16)
 /**
  * This function implements hton for uint32_t values
  */
-extern uint32_t
-synctory_hton32(uint32_t host32)
+uint32_t
+_synctory_hton32(uint32_t host32)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_32(host32);
     else
         return host32;
@@ -110,10 +110,10 @@ synctory_hton32(uint32_t host32)
 /**
  * This function implements hton for uint64_t values
  */
-extern uint64_t
-synctory_hton64(uint64_t host64)
+uint64_t
+_synctory_hton64(uint64_t host64)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_64(host64);
     else
         return host64;
@@ -123,10 +123,10 @@ synctory_hton64(uint64_t host64)
 /**
  * This function implements ntoh for uint16_t values
  */
-extern uint16_t
-synctory_ntoh16(uint16_t net16)
+uint16_t
+_synctory_ntoh16(uint16_t net16)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_16(net16);
     else
         return net16;
@@ -136,10 +136,10 @@ synctory_ntoh16(uint16_t net16)
 /**
  * This function implements ntoh for uint32_t values
  */
-extern uint32_t
-synctory_ntoh32(uint32_t net32)
+uint32_t
+_synctory_ntoh32(uint32_t net32)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_32(net32);
     else
         return net32;
@@ -149,10 +149,10 @@ synctory_ntoh32(uint32_t net32)
 /**
  * This function implements ntoh for uint64_t values
  */
-extern uint64_t
-synctory_ntoh64(uint64_t net64)
+uint64_t
+_synctory_ntoh64(uint64_t net64)
 {
-    if (SYNCTORY_ENDIANESS == LITTLEENDIAN)
+    if (_SYNCTORY_ENDIANESS == LITTLEENDIAN)
         return __synctory_byteswap_64(net64);
     else
         return net64;

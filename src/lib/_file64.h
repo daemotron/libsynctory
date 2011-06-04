@@ -47,7 +47,7 @@
 
 #include "config.h"
 
-#define SYNCTORY_FILE64_BUFSIZE 512
+#define _SYNCTORY_FILE64_BUFSIZE 512
 
 /*
  * FIXME
@@ -60,25 +60,25 @@
  */
 
 #if (defined HAVE_STAT_R) && (!defined HAVE_STAT64_R)
-typedef struct stat synctory_file64_stat_t;
+typedef struct stat _synctory_file64_stat_t;
 #elif (defined HAVE_STAT64_R) && (defined HAVE_LARGEFILE_S)
-typedef struct stat64 synctory_file64_stat_t;
+typedef struct stat64 _synctory_file64_stat_t;
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
 
 #if (OFFT_SIZE == 8)
-typedef off_t synctory_off_t;
+typedef off_t _synctory_off_t;
 #elif (OFFT_SIZE < 8) && (defined OFF64T_SIZE)
-typedef off64_t synctory_off_t;
+typedef off64_t _synctory_off_t;
 #else
 #error "libsynctory only supports 64 bit file pointers!\n"
 #endif
 
-extern int synctory_file64_open(const char *path, int oflag, ...);
-extern int synctory_file64_close(int fd);
-extern synctory_off_t synctory_file64_seek(int fd, int64_t offset, int whence);
-extern synctory_off_t synctory_file64_bytecopy(int fdsource, int fddest, synctory_off_t offset, synctory_off_t bytes);
+int _synctory_file64_open(const char *path, int oflag, ...);
+int _synctory_file64_close(int fd);
+_synctory_off_t _synctory_file64_seek(int fd, int64_t offset, int whence);
+_synctory_off_t _synctory_file64_bytecopy(int fdsource, int fddest, _synctory_off_t offset, _synctory_off_t bytes);
 int _synctory_file64_get_fd(int *flag, int fd, const char *path, char mode);
 
 #endif /* __LIBSYNCTORY_FILE64_H */

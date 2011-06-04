@@ -41,17 +41,17 @@ typedef enum
 {
     LITTLEENDIAN,
     BIGENDIAN
-} synctory_endianess_t;
+} _synctory_endianess_t;
 
 
-synctory_endianess_t __synctory_detect_endianess(void);
-#define SYNCTORY_ENDIANESS __synctory_detect_endianess()
+_synctory_endianess_t __synctory_detect_endianess(void);
+#define _SYNCTORY_ENDIANESS __synctory_detect_endianess()
 
-extern uint16_t synctory_hton16(uint16_t host16);
-extern uint32_t synctory_hton32(uint32_t host32);
-extern uint64_t synctory_hton64(uint64_t host64);
-extern uint16_t synctory_ntoh16(uint16_t net16);
-extern uint32_t synctory_ntoh32(uint32_t net32);
-extern uint64_t synctory_ntoh64(uint64_t net64);
+uint16_t _synctory_hton16(uint16_t host16);
+uint32_t _synctory_hton32(uint32_t host32);
+uint64_t _synctory_hton64(uint64_t host64);
+uint16_t _synctory_ntoh16(uint16_t net16);
+uint32_t _synctory_ntoh32(uint32_t net32);
+uint64_t _synctory_ntoh64(uint64_t net64);
 
 #endif /* __LIBSYNCTORY_ENDIANESS_H_ */

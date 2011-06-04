@@ -30,10 +30,10 @@
 
 
 
-extern int
-synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
+int
+_synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
 {
-    unsigned char header[SYNCTORY_FH_BYTES];
+    unsigned char header[_SYNCTORY_FH_BYTES];
     unsigned char *sourcebuffer = NULL;
     unsigned char *destbuffer;
     unsigned char *destptr = NULL;
@@ -41,15 +41,15 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
     int i;
     ssize_t rbytes = 0;
     int rval = 0;
-    synctory_off_t position;
-    synctory_fheader_t fh;
+    _synctory_off_t position;
+    _synctory_fheader_t fh;
     unsigned int destbufsize;
     
     sourcebuffer = (unsigned char *)malloc(ctx->chunk_size);
     if (NULL == sourcebuffer)
         return errno;
     
-    destbufsize = SYNCTORY_FINGERPRINT_WRITE_BUFFER * (sizeof(uint32_t) + synctory_strong_checksum_destbufsize((uint8_t)ctx->checksum_algorithm));
+    destbufsize = _SYNCTORY_FINGERPRINT_WRITE_BUFFER * (sizeof(uint32_t) + _synctory_strong_checksum_size(ctx->checksum_algorithm));
     destbuffer = (unsigned char *)malloc(destbufsize);
     if (NULL == destbuffer)
     {
@@ -58,7 +58,7 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
     }
     destptr = &destbuffer[0];
     
-    position = synctory_file64_seek(source, 0, SEEK_END);
+    position = _synctory_file64_seek(source, 0, SEEK_END);
     if (position < 0)
     {
         free(sourcebuffer);
@@ -66,13 +66,13 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
         return errno;
     }
     
-    fh.type = SYNCTORY_FH_FINGERPRINT;
-    fh.version = LIBSYNCTORY_VERSION_NUM;
+    fh.type = _SYNCTORY_FH_FINGERPRINT;
+    fh.version = _SYNCTORY_VERSION_NUM;
     fh.chunksize = ctx->chunk_size;
     fh.algo = ctx->checksum_algorithm;
     fh.filesize = (uint64_t)position;
     
-    rval = synctory_fh_setheader_bf(&fh, header, SYNCTORY_FH_BYTES);
+    rval = _synctory_fh_setheader_bf(&fh, header, _SYNCTORY_FH_BYTES);
     if (rval)
     {
         free(sourcebuffer);
@@ -80,7 +80,7 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
         return rval;
     }
     
-    position = synctory_file64_seek(dest, 0, SEEK_SET);
+    position = _synctory_file64_seek(dest, 0, SEEK_SET);
     if (position < 0)
     {
         free(sourcebuffer);
@@ -89,15 +89,15 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
     }
     
     /* Write header information into destination file */
-    rbytes = write(dest, &header[0], SYNCTORY_FH_BYTES);
-    if (rbytes != SYNCTORY_FH_BYTES)
+    rbytes = write(dest, &header[0], _SYNCTORY_FH_BYTES);
+    if (rbytes != _SYNCTORY_FH_BYTES)
     {
         free(sourcebuffer);
         free(destbuffer);
         return -1;
     }
     
-    position = synctory_file64_seek(source, 0, SEEK_SET);
+    position = _synctory_file64_seek(source, 0, SEEK_SET);
     if (position < 0)
     {
         free(sourcebuffer);
@@ -108,13 +108,13 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
     /* read chunks from source file until EOF is reached */
     while ((rbytes = read(source, sourcebuffer, ctx->chunk_size)) > 0)
     {
-        weaksum = synctory_hton32(synctory_weak_checksum(sourcebuffer, rbytes));
+        weaksum = _synctory_hton32(_synctory_weak_checksum(sourcebuffer, rbytes));
         for (i = 0; i < 4; ++i)
         {
             *destptr = *(((unsigned char *)&weaksum)+i);
             destptr++;
         }
-        synctory_strong_checksum(sourcebuffer, rbytes, destptr, ctx->checksum_algorithm);
+        _synctory_strong_checksum(sourcebuffer, rbytes, destptr, ctx->checksum_algorithm);
         
         if ((unsigned int)(destptr - &destbuffer[0]) >= (destbufsize - 1))
         {
@@ -130,7 +130,7 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
         }
             else
         {
-            destptr += synctory_strong_checksum_destbufsize((uint8_t)ctx->checksum_algorithm);
+            destptr += _synctory_strong_checksum_size(ctx->checksum_algorithm);
         }
     }
     
@@ -152,76 +152,76 @@ synctory_fingerprint_create_fd(synctory_ctx_t *ctx, int source, int dest)
 }
 
 
-extern int
-synctory_fingerprint_create_fn(synctory_ctx_t *ctx, const char *sourcefile, const char *destfile)
+int
+_synctory_fingerprint_create_fn(synctory_ctx_t *ctx, const char *sourcefile, const char *destfile)
 {
     int rval = 0;
     int source, dest;
     
     /* open originating file */
-    source = synctory_file64_open(sourcefile, O_RDONLY);
+    source = _synctory_file64_open(sourcefile, O_RDONLY);
     if (source < 0)
         return errno;
     
     /* open file where the fingerprint should be written to */
-    dest = synctory_file64_open(destfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    dest = _synctory_file64_open(destfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest < 0)
     {
-        synctory_file64_close(source);
+        _synctory_file64_close(source);
         return errno;
     }
     
-    rval = synctory_fingerprint_create_fd(ctx, source, dest);
+    rval = _synctory_fingerprint_create_fd(ctx, source, dest);
     
-    synctory_file64_close(source);
-    synctory_file64_close(dest);
+    _synctory_file64_close(source);
+    _synctory_file64_close(dest);
     return rval;
 }
 
 
-extern int 
-synctory_fingerprint_fetchheader_fd(int fd, synctory_fheader_t *header)
+int 
+_synctory_fingerprint_fetchheader_fd(int fd, _synctory_fheader_t *header)
 {
-    return synctory_fh_getheader_fd(header, fd);
+    return _synctory_fh_getheader_fd(header, fd);
 }
 
 
-extern int
-synctory_fingerprint_fetchheader_fn(const char *fpfile, synctory_fheader_t *header)
+int
+_synctory_fingerprint_fetchheader_fn(const char *fpfile, _synctory_fheader_t *header)
 {
-    return synctory_fh_getheader_fn(header, fpfile);
+    return _synctory_fh_getheader_fn(header, fpfile);
 }
 
 
-extern int
-synctory_fingerprint_read_iter_fd(int fd, uint32_t *weaksum, unsigned char *strongsum, size_t len, synctory_fingerprint_iterctx_t *ctx)
+int
+_synctory_fingerprint_read_iter_fd(int fd, uint32_t *weaksum, unsigned char *strongsum, size_t len, _synctory_fingerprint_iterctx_t *ctx)
 {
     unsigned char buf[4];
     ssize_t rbytes;
     
     if (0 == ctx->offset)
     {
-        synctory_fheader_t header;
-        synctory_fingerprint_fetchheader_fd(fd, &header);
-        if(SYNCTORY_FH_BYTES != synctory_file64_seek(fd, SYNCTORY_FH_BYTES, SEEK_SET))
+        _synctory_fheader_t header;
+        _synctory_fingerprint_fetchheader_fd(fd, &header);
+        if(_SYNCTORY_FH_BYTES != _synctory_file64_seek(fd, _SYNCTORY_FH_BYTES, SEEK_SET))
                 return errno;
-        ctx->offset = SYNCTORY_FH_BYTES;
+        ctx->offset = _SYNCTORY_FH_BYTES;
         ctx->algo = header.algo;
     }
     else
-        if(0 > synctory_file64_seek(fd, ctx->offset, SEEK_SET))
+        if(0 > _synctory_file64_seek(fd, ctx->offset, SEEK_SET))
             return errno;
             
     rbytes = read(fd, buf, 4);
     if (rbytes != 4)
         return -1;
     
-    *weaksum = synctory_ntoh32(*((uint32_t *)(&buf[0])));
+    *weaksum = _synctory_ntoh32(*((uint32_t *)(&buf[0])));
     rbytes = read(fd, strongsum, len);
     if (rbytes != (ssize_t)len)
         return -1;
     
-    ctx->offset += (synctory_strong_checksum_destbufsize(ctx->algo) + 4);
+    ctx->offset += (_synctory_strong_checksum_size(ctx->algo) + 4);
     
     return 0;
 }

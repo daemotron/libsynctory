@@ -37,25 +37,25 @@
 /**
  * Synctory diff file block type definition for a known chunk.
  */
-#define SYNCTORY_DIFF_BTYPE_CHUNK  0x10U
+#define _SYNCTORY_DIFF_BTYPE_CHUNK  0x10U
 
 /**
  * Synctory diff file block type definition for (yet unknown) raw data.
  */
-#define SYNCTORY_DIFF_BTYPE_RAW    0x20U
+#define _SYNCTORY_DIFF_BTYPE_RAW    0x20U
 
 /**
  * Create a binary diff based on the fingerprint read from the fdfinger
  * file handle, compared to the file content read from the fdsource file
  * handle and stored in the file designated by the fddiff file handle.
  */
-extern int synctory_diff_create_fd(int fdfinger, int fdsource, int fddiff);
+int _synctory_diff_create_fd(int fdfinger, int fdsource, int fddiff);
 
 /**
  * Create a binary diff based on the fingerprint read from the file named
  * fingerprint, compared to the file content read from the file named sourcefile
  * and stored in the file named difffile.
  */
-extern int synctory_diff_create_fn(const char *fingerprint, const char *sourcefile, const char *difffile);
+int _synctory_diff_create_fn(const char *fingerprint, const char *sourcefile, const char *difffile);
 
 #endif /* __LIBSYNCTORY_DIFF_H_ */

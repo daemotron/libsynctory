@@ -30,7 +30,7 @@
  * 
  * Relevant for fingerprint creation
  */
-#define SYNCTORY_DEFAULT_CHUNKSIZE      512U
+#define _SYNCTORY_DEFAULT_CHUNKSIZE      512U
 
 
 /*
@@ -43,6 +43,6 @@
  * 
  * Valid algorithm constants are defined in synctory.h
  */
-#define SYNCTORY_DEFAULT_CHECKSUM       0x10
+#define _SYNCTORY_DEFAULT_CHECKSUM       0x10
 
 #endif /* __LIBSYNCTORY_DEFAULT_H */
