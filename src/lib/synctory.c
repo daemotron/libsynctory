@@ -56,7 +56,7 @@ synctory_version(uint64_t *num, void *buffer, size_t len)
 
 
 extern void
-synctory_ctx_init(synctory_ctx_t *ctx)
+synctory_init(synctory_ctx_t *ctx)
 {
     ctx->checksum_algorithm = SYNCTORY_DEFAULT_CHECKSUM;
     ctx->chunk_size = SYNCTORY_DEFAULT_CHUNKSIZE;
@@ -64,7 +64,7 @@ synctory_ctx_init(synctory_ctx_t *ctx)
 
 
 extern int
-synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file)
+synctory_fingerprint(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file)
 {
     /* sfd = source file descriptor, dfd = destination file descriptor */
     int sfd = 0;
@@ -87,7 +87,7 @@ synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, con
 
 
 extern int
-synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file)
+synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file)
 {
     /* sfd = source file descriptor, dfd = destination file descriptor */
     int sfd = 0;
@@ -114,7 +114,7 @@ synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, const char 
 
 
 extern int
-synctory_synth_create(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file)
+synctory_synth(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file)
 {
     /* sfd = source file descriptor, dfd = destination file descriptor */
     int sfd = 0;

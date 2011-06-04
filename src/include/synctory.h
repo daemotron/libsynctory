@@ -96,7 +96,7 @@ extern size_t synctory_version_bytes(void);
  * time for libsynctory. After initialization, some properties of the
  * context object can be changed to meet specific needs.
  */
-extern void synctory_ctx_init(synctory_ctx_t *ctx);
+extern void synctory_init(synctory_ctx_t *ctx);
 
 
 /**
@@ -114,7 +114,7 @@ extern void synctory_ctx_init(synctory_ctx_t *ctx);
  * To skip one form of indication, simply provide a NULL pointer for path names,
  * or a negative integer (usually -1) for the file descriptor.
  */
-extern int synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file);
+extern int synctory_fingerprint(synctory_ctx_t *ctx, int source_fd, int dest_fd, const char *source_file, const char *dest_file);
 
 
 /**
@@ -142,14 +142,14 @@ extern int synctory_fingerprint_create(synctory_ctx_t *ctx, int source_fd, int d
  * To skip one form of indication, simply provide a NULL pointer for path names,
  * or a negative integer (usually -1) for the file descriptor.
  */
-extern int synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file);
+extern int synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file);
 
 
 /**
  * Synthesize a file based on a diff and a source file.
  * 
  * Using this function, it is possible to synthesize the file f2 (see comments
- * above concerning synctory_diff_create) from the file f1 and the diff
+ * above concerning synctory_diff) from the file f1 and the diff
  * created from the fingerprint of f1 and the contents of f2.
  * 
  * This function takes three arguments:
@@ -169,6 +169,6 @@ extern int synctory_diff_create(int source_fd, int dest_fd, int fingerprint_fd, 
  * To skip one form of indication, simply provide a NULL pointer for path names,
  * or a negative integer (usually -1) for the file descriptor.
  */
-extern int synctory_synth_create(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file);
+extern int synctory_synth(int source_fd, int dest_fd, int diff_fd, const char *source_file, const char *dest_file, const char *diff_file);
 
 #endif /* __LIBSYNCTORY_SYNCTORY_H */
