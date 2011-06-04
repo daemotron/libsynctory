@@ -1,0 +1,43 @@
+
+  LIBSYNCTORY INSTALLATION OVERVIEW
+
+  Reqiurements
+  ------------
+
+  The following software components must be present on your system for being
+  able to use libsynctory:
+
+  * OpenSSL 0.9.8 or newer
+  * A POSIX c99 compliant libc
+
+  The following software components must be present on your system for being
+  able to build and install libsynctory:
+
+  * a C compiler compliant to ANSI c99 standard (e. g. gcc 4.2 or newer, clang 2.8 or newer)
+  * cmake 2.8 or newer
+  * a POSIX compatible command line interpreter ("shell"), e. g. bash, zsh, or ksh
+
+
+  Installation
+  ------------
+  
+  Assuming you do not have the sources on your computer, these instructions include
+  obtaining the sources from GitHub (git 1.7 or newer required):
+
+    $ git clone git://github.com/daemotron/libsynctory.git
+
+    $ cd libsynctory && mkdir build
+
+    $ cd build/
+
+    $ cmake ../
+
+    $ make
+
+    $ sudo make install
+
+    $ make clean
+
+  By default, this will install libsynctory.so to /usr/local/lib and libsynctory.h to
+  /usr/local/include. Please consult the cmake documentation to find out how to change
+  the installation prefix.
