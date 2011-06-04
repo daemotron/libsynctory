@@ -37,13 +37,14 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "version.h"
+
 #include "_checksum.h"
 #include "_diff.h"
 #include "_endianess.h"
 #include "_fingerprint.h"
 #include "_fheader.h"
 #include "_file64.h"
-#include "version.h"
 
 
 /**

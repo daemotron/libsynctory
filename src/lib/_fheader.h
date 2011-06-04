@@ -35,10 +35,12 @@
 #ifndef __LIBSYNCTORY_FHEADER_H_
 #define __LIBSYNCTORY_FHEADER_H_
 
+
 #include <stddef.h>
 #include <stdint.h>
 
 #include <synctory.h>
+
 
 /**
  * Length of a synctory file header in bytes.

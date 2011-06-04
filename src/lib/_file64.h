@@ -34,6 +34,7 @@
 #ifndef __LIBSYNCTORY_FILE64_H
 #define __LIBSYNCTORY_FILE64_H
 
+
 /*
  * NOTE
  * unistd.h provides the seek whence flags. This include is just for
@@ -46,6 +47,7 @@
 #include <sys/stat.h>
 
 #include "config.h"
+
 
 #define _SYNCTORY_FILE64_BUFSIZE 512
 

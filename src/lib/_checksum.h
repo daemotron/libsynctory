@@ -18,13 +18,14 @@
 #ifndef __LIBSYNCTORY_CHECKSUM_H_
 #define __LIBSYNCTORY_CHECKSUM_H_
 
-#include <synctory.h>
 
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <openssl/ripemd.h>
+
+#include <synctory.h>
 
 
 /**

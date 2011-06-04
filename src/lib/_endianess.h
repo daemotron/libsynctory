@@ -35,7 +35,9 @@
 #ifndef __LIBSYNCTORY_ENDIANESS_H_
 #define __LIBSYNCTORY_ENDIANESS_H_
 
+
 #include <stdint.h>
+
 
 typedef enum
 {

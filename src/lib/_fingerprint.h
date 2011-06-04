@@ -18,6 +18,7 @@
 #ifndef __LIBSYNCTORY_FINGERPRINT_H_
 #define __LIBSYNCTORY_FINGERPRINT_H_
 
+
 #include <stddef.h>
 #include <stdint.h>
 

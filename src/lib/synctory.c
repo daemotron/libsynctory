@@ -14,13 +14,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <synctory.h>
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <synctory.h>
 
 #include "config.h"
 #include "version.h"

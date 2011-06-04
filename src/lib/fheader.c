@@ -40,10 +40,12 @@
 
 #include <synctory.h>
 
+#include "version.h"
+
 #include "_endianess.h"
 #include "_fheader.h"
 #include "_file64.h"
-#include "version.h"
+
 
 /**
  * The functions in this file take care of synctory file header

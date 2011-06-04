@@ -28,6 +28,7 @@
 
 #include "_checksum.h"
 
+
 /**
  * This function implements the rolling checksum function as described by
  * [http://rsync.samba.org/tech_report/node3.html]. This checksum function

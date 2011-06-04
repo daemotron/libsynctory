@@ -22,6 +22,7 @@
 #include <errno.h>
 
 #include "version.h"
+
 #include "_checksum.h"
 #include "_fingerprint.h"
 #include "_endianess.h"
