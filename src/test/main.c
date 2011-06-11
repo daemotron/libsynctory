@@ -31,6 +31,23 @@
 #include "tests.h"
 
 
+#define DEFAULT_DIR     "."
+#define DEFAULT_RANDOM  "/dev/urandom"
+
+
+void usage(void)
+{
+    printf(
+        "Usage: synctory_test [options]\n\n"
+        "Options:\n"
+        "  -C           Don't clean up temporary files\n"
+        "  -d <path>    Use <path> for temporary files. Defaults to %s\n"
+        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n\n",
+        DEFAULT_DIR, DEFAULT_RANDOM
+    );
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -42,13 +59,16 @@ int main(int argc, char **argv)
     
     test_init(&ctx);
     
-    while ((ch = getopt(argc, argv, "hd:r:")) != -1)
+    while ((ch = getopt(argc, argv, "hCd:r:")) != -1)
     {
         switch (ch)
         {
             case 'h':
                 usage();
                 return EXIT_SUCCESS;
+            case 'C':
+                ctx.cleanup = 0;
+                break;
             case 'd':
                 if (NULL != optarg)
                     abs_path(optarg, ctx.workdir, 2048);
@@ -61,6 +81,10 @@ int main(int argc, char **argv)
                 else
                     return EXIT_FAILURE;
                 break;
+            default:
+                printf("\n");
+                usage();
+                return EXIT_FAILURE;
         }
     }
     
@@ -85,6 +109,16 @@ int main(int argc, char **argv)
     /* Standard message */
     printf("\n=============================\nlibsynctory testing framework\n=============================\n\n");
     
+    /* display settings */
+    printf("Settings for current test run:\n------------------------------\n\n");
+    printf("Working directory:          %s\n", ctx.workdir);
+    printf("Random device:              %s\n", ctx.random_device);
+    printf("Delete temporary files:     ");
+    if (ctx.cleanup)
+        printf("YES\n");
+    else
+        printf("NO\n");
+    printf("\n\n\n");
     
     /* run tests */
     for (test_cur = 0; test_cur < test_total; test_cur++)

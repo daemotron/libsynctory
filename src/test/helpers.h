@@ -19,15 +19,11 @@
 #define __SYNCTORY_TEST_HELPERS_
 
 
-#define DEFAULT_DIR     "."
-#define DEFAULT_RANDOM  "/dev/urandom"
 #define CHUNK_SIZE      512
 
 
 void abs_path(const char *source, char *dest, size_t len);
 int random_file(const char *path, const char *device, size_t size);
 void report_error(int error_no);
-void usage(void);
-
 
 #endif /* __SYNCTORY_TEST_HELPERS_ */

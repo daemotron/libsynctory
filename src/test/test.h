@@ -28,12 +28,15 @@ typedef struct
 {
     char workdir[2048];
     char random_device[2048];
+    int cleanup;
 } test_ctx_t;
+
 
 
 #define test_init(ctx) {                                \
     memset((ctx)->workdir, (int)'\0', 2048);            \
     memset((ctx)->random_device, (int)'\0', 2048);      \
+    (ctx)->cleanup = 1;                                 \
 }
 
 

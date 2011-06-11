@@ -41,6 +41,9 @@ void abs_path(const char *source, char *dest, size_t len)
         strncpy(ptr, cwd, cbytes);
         ptr += cbytes;
         fbytes -= cbytes;
+        ptr[0] = '/';
+        ptr++;
+        fbytes--;
     }
     
     cbytes = (fbytes < (strlen(source) - 1) ? fbytes: (strlen(source) - 1));
@@ -126,16 +129,4 @@ void report_error(int error_no)
         fprintf(stderr, "Error %d: %s\n", error_no, strerror(error_no));
     else
         fprintf(stderr, "Unknown error.\n");
-}
-
-
-void usage(void)
-{
-    printf(
-        "Usage: synctory_test [options]\n\n"
-        "Options:\n"
-        "  -d <path>    Use <path> for temporary files. Defaults to %s\n"
-        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n\n",
-        DEFAULT_DIR, DEFAULT_RANDOM
-    );
 }
