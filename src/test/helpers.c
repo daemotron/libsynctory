@@ -27,7 +27,7 @@
 #include "helpers.h"
 
 
-void abs_path(const char *source, char *dest, size_t len)
+void hlp_abs_path(const char *source, char *dest, size_t len)
 {
     char *ptr = dest;
     size_t fbytes = len - 1;
@@ -66,11 +66,11 @@ void abs_path(const char *source, char *dest, size_t len)
 }
 
 
-int random_file(const char *path, const char *device, size_t size)
+int hlp_random_file(const char *path, const char *device, size_t size)
 {
     size_t rtd = size;
     ssize_t rbytes;
-    unsigned char buffer[CHUNK_SIZE];
+    unsigned char buffer[HLP_CHUNK_SIZE];
     int source, dest;
     
     dest = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -81,26 +81,26 @@ int random_file(const char *path, const char *device, size_t size)
     if (dest < 0)
         return ((errno != 0) ? errno : -1);
     
-    while (rtd > CHUNK_SIZE)
+    while (rtd > HLP_CHUNK_SIZE)
     {
-        memset(buffer, (int)'\0', CHUNK_SIZE);
-        rbytes = read(source, &buffer[0], CHUNK_SIZE);
-        if (rbytes != CHUNK_SIZE)
+        memset(buffer, (int)'\0', HLP_CHUNK_SIZE);
+        rbytes = read(source, &buffer[0], HLP_CHUNK_SIZE);
+        if (rbytes != HLP_CHUNK_SIZE)
         {
             fprintf(stderr, "Could not read enough random bytes from %s\n", device);
             close(source);
             close(dest);
             return ((errno != 0) ? errno : -1);
         }
-        rbytes = write(dest, &buffer[0], CHUNK_SIZE);
-        if (rbytes != CHUNK_SIZE)
+        rbytes = write(dest, &buffer[0], HLP_CHUNK_SIZE);
+        if (rbytes != HLP_CHUNK_SIZE)
         {
             fprintf(stderr, "Could not write required number of bytes to %s\n", path);
             close(source);
             close(dest);
             return ((errno != 0) ? errno : -1);
         }
-        rtd -= CHUNK_SIZE;
+        rtd -= HLP_CHUNK_SIZE;
     }
     
     memset(buffer, (int)'\0', rtd);
@@ -127,7 +127,7 @@ int random_file(const char *path, const char *device, size_t size)
 }
 
 
-void report_error(int error_no)
+void hlp_report_error(int error_no)
 {
     if (error_no > 0)
         fprintf(stderr, "Error %d: %s\n", error_no, strerror(error_no));

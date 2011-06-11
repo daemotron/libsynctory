@@ -71,13 +71,13 @@ int main(int argc, char **argv)
                 break;
             case 'd':
                 if (NULL != optarg)
-                    abs_path(optarg, ctx.workdir, 2048);
+                    hlp_abs_path(optarg, ctx.workdir, 2048);
                 else
                     return EXIT_FAILURE;
                 break;
             case 'r':
                 if (NULL != optarg)
-                    abs_path(optarg, ctx.random_device, 2048);
+                    hlp_abs_path(optarg, ctx.random_device, 2048);
                 else
                     return EXIT_FAILURE;
                 break;
@@ -89,10 +89,10 @@ int main(int argc, char **argv)
     }
     
     if (strlen(ctx.workdir) == 0)
-        abs_path(DEFAULT_DIR, ctx.workdir, 2048);
+        hlp_abs_path(DEFAULT_DIR, ctx.workdir, 2048);
     
     if (strlen(ctx.random_device) == 0)
-        abs_path(DEFAULT_RANDOM, ctx.random_device, 2048);
+        hlp_abs_path(DEFAULT_RANDOM, ctx.random_device, 2048);
     
     
     /* determine total number of tests */
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
     result = (int *)malloc(test_total * sizeof(int));
     if (NULL == result)
     {
-        report_error(errno);
+        hlp_report_error(errno);
         return EXIT_FAILURE;
     }
     
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
         if (result[test_cur])
         {
             printf("failed: ");
-            report_error(result[test_cur]);
+            hlp_report_error(result[test_cur]);
             printf("\n\n");
         }
         else

@@ -19,11 +19,11 @@
 #define __SYNCTORY_TEST_HELPERS_
 
 
-#define CHUNK_SIZE      512
+#define HLP_CHUNK_SIZE  512
 
 
-void abs_path(const char *source, char *dest, size_t len);
-int random_file(const char *path, const char *device, size_t size);
-void report_error(int error_no);
+void    hlp_abs_path(const char *source, char *dest, size_t len);
+int     hlp_random_file(const char *path, const char *device, size_t size);
+void    hlp_report_error(int error_no);
 
 #endif /* __SYNCTORY_TEST_HELPERS_ */
