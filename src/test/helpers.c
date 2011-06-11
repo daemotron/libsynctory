@@ -41,9 +41,13 @@ void abs_path(const char *source, char *dest, size_t len)
         strncpy(ptr, cwd, cbytes);
         ptr += cbytes;
         fbytes -= cbytes;
-        ptr[0] = '/';
-        ptr++;
-        fbytes--;
+        if (fbytes > 0)
+        {
+            ptr[0] = '/';
+            ptr++;
+            fbytes--;
+            ptr[0] = '\0';
+        }
     }
     
     cbytes = (fbytes < (strlen(source) - 1) ? fbytes: (strlen(source) - 1));
