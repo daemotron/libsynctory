@@ -33,6 +33,7 @@
 
 #define DEFAULT_DIR     "."
 #define DEFAULT_RANDOM  "/dev/urandom"
+#define DEFAULT_ZERO    "/dev/zero"
 
 
 void usage(void)
@@ -42,8 +43,9 @@ void usage(void)
         "Options:\n"
         "  -C           Don't clean up temporary files\n"
         "  -d <path>    Use <path> for temporary files. Defaults to %s\n"
-        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n\n",
-        DEFAULT_DIR, DEFAULT_RANDOM
+        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n",
+        "  -z <path>    Use <path> to read zero bytes. Defaults to %s\n\n",
+        DEFAULT_DIR, DEFAULT_RANDOM, DEFAULT_ZERO
     );
 }
 
@@ -59,7 +61,7 @@ int main(int argc, char **argv)
     
     test_init(&ctx);
     
-    while ((ch = getopt(argc, argv, "hCd:r:")) != -1)
+    while ((ch = getopt(argc, argv, "hCd:r:z:")) != -1)
     {
         switch (ch)
         {
@@ -81,6 +83,12 @@ int main(int argc, char **argv)
                 else
                     return EXIT_FAILURE;
                 break;
+            case 'z':
+                if (NULL != optarg)
+                    hlp_abs_path(optarg, ctx.zero_device, 2048);
+                else
+                    return EXIT_FAILURE;
+                break;
             default:
                 printf("\n");
                 usage();
@@ -93,7 +101,10 @@ int main(int argc, char **argv)
     
     if (strlen(ctx.random_device) == 0)
         hlp_abs_path(DEFAULT_RANDOM, ctx.random_device, 2048);
-    
+
+    if (strlen(ctx.zero_device) == 0)
+        hlp_abs_path(DEFAULT_ZERO, ctx.zero_device, 2048);
+
     
     /* determine total number of tests */
     test_total = test_max();
