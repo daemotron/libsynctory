@@ -18,12 +18,28 @@
 #ifndef __SYNCTORY_TEST_HELPERS_
 #define __SYNCTORY_TEST_HELPERS_
 
+#include <stdio.h>
 
 #define HLP_CHUNK_SIZE  512
 
 
+typedef struct
+{
+    char character;
+    unsigned int width;
+    FILE *stream;
+} hlp_progress_t;
+
+
+#define hlp_progress_init(ctx) {        \
+    (ctx)->char = '\0';                 \
+    (ctx)->width = 0;                   \
+    (ctx)->stream = NULL;               \
+}
+
+
 void    hlp_abs_path(const char *source, char *dest, size_t len);
-int     hlp_random_file(const char *path, const char *device, size_t size);
+int     hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx);
 void    hlp_report_error(int error_no);
 
 #endif /* __SYNCTORY_TEST_HELPERS_ */

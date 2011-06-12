@@ -66,37 +66,37 @@ void hlp_abs_path(const char *source, char *dest, size_t len)
 }
 
 
-int hlp_random_file(const char *path, const char *device, size_t size)
+int hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx)
 {
     size_t rtd = size;
     ssize_t rbytes;
     unsigned char buffer[HLP_CHUNK_SIZE];
-    int source, dest;
+    int src, dest;
     
-    dest = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    dest = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest < 0)
         return ((errno != 0) ? errno : -1);
     
-    source = open(device, O_RDONLY);
+    src = open(source, O_RDONLY);
     if (dest < 0)
         return ((errno != 0) ? errno : -1);
     
     while (rtd > HLP_CHUNK_SIZE)
     {
         memset(buffer, (int)'\0', HLP_CHUNK_SIZE);
-        rbytes = read(source, &buffer[0], HLP_CHUNK_SIZE);
+        rbytes = read(src, &buffer[0], HLP_CHUNK_SIZE);
         if (rbytes != HLP_CHUNK_SIZE)
         {
-            fprintf(stderr, "Could not read enough random bytes from %s\n", device);
-            close(source);
+            fprintf(stderr, "Could not read enough random bytes from %s\n", source);
+            close(src);
             close(dest);
             return ((errno != 0) ? errno : -1);
         }
         rbytes = write(dest, &buffer[0], HLP_CHUNK_SIZE);
         if (rbytes != HLP_CHUNK_SIZE)
         {
-            fprintf(stderr, "Could not write required number of bytes to %s\n", path);
-            close(source);
+            fprintf(stderr, "Could not write required number of bytes to %s\n", destination);
+            close(src);
             close(dest);
             return ((errno != 0) ? errno : -1);
         }
@@ -104,24 +104,24 @@ int hlp_random_file(const char *path, const char *device, size_t size)
     }
     
     memset(buffer, (int)'\0', rtd);
-    rbytes = read(source, &buffer[0], rtd);
+    rbytes = read(src, &buffer[0], rtd);
     if ((size_t)rbytes != rtd)
     {
-        fprintf(stderr, "Could not read enough random bytes from %s\n", device);
-        close(source);
+        fprintf(stderr, "Could not read enough random bytes from %s\n", source);
+        close(src);
         close(dest);
         return ((errno != 0) ? errno : -1);
     }
     rbytes = write(dest, &buffer[0], rtd);
     if ((size_t)rbytes != rtd)
     {
-        fprintf(stderr, "Could not write required number of bytes to %s\n", path);
-        close(source);
+        fprintf(stderr, "Could not write required number of bytes to %s\n", destination);
+        close(src);
         close(dest);
         return ((errno != 0) ? errno : -1);
     }
     
-    close(source);
+    close(src);
     close(dest);
     return 0;
 }
