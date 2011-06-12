@@ -21,6 +21,7 @@ link_directories(${libsynctory_BINARY_DIR}/src/lib)
 set(
     SYNCTORY_TEST_CASES
     test_version.c
+    test_fingerprint.c
 )
 
 

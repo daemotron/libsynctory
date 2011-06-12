@@ -15,23 +15,14 @@
  */
 
 
-#ifndef __SYNCTORY_TESTS_H_
-#define __SYNCTORY_TESTS_H_
+#include <synctory.h>
 
-#include "test.h"
-
-
-/*
- * NOTE
- * 
- * Please list all test function prototypes here.
- * Do not forget to include them in the test array in
- * tests.c
- */
-
-void test_version(const test_ctx_t *ctx, int *status);
-void test_fingerprint(const test_ctx_t *ctx, int *status);
+#include "tests.h"
+#include "helpers.h"
 
 
-
-#endif /* __SYNCTORY_TESTS_H_ */
+void test_fingerprint(const test_ctx_t *ctx, int *status)
+{
+    
+    *status = 0;
+}

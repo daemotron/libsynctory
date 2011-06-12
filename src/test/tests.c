@@ -39,6 +39,7 @@
 static test_t tests[] =
 {
     { "libsynctory version information", test_version },
+    { "libsynctory fingerprint test", test_fingerprint },
     
     /* terminator of the tests array. Keep this under all circumstances! */
     { NULL, NULL },
