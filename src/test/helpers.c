@@ -72,6 +72,7 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
     ssize_t rbytes;
     unsigned char buffer[HLP_CHUNK_SIZE];
     int src, dest;
+    uint64_t i = 0, n = 0, j;
     
     dest = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest < 0)
@@ -80,6 +81,8 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
     src = open(source, O_RDONLY);
     if (dest < 0)
         return ((errno != 0) ? errno : -1);
+    
+    n = (uint64_t)size / (uint64_t)HLP_CHUNK_SIZE;
     
     while (rtd > HLP_CHUNK_SIZE)
     {
@@ -101,6 +104,36 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
             return ((errno != 0) ? errno : -1);
         }
         rtd -= HLP_CHUNK_SIZE;
+        ++i;
+        
+        /* if progress context has been provided, print progress characters */
+        if (pctx)
+        {
+            /* case 1: more or eq. chunks than progress characters to print */
+            if (n >= (pctx->width - 1))
+            {
+                /* print progress character every umtenth time */
+                if (i % (n/(pctx->width - 1)))
+                    fprintf(pctx->stream, "%c", pctx->character);
+            }
+            /* case 2: more progress characters to print than chuncs to copy */
+            else
+            {
+                /* print umph progress characters with every copied chunk */
+                for (j = 0; j < ((pctx->width - 1) / n); j++)
+                    fprintf(pctx->stream, "%c", pctx->character);
+            }    
+        }
+    }
+    
+    /* print reminaing progress characters (only happens in case 2) */
+    if (pctx)
+    {
+        if (n < (pctx->width - 1))
+        {
+            for (j = 0; j < ((pctx->width - 1) % n); j++)
+                fprintf(pctx->stream, "%c", pctx->character);
+        }
     }
     
     memset(buffer, (int)'\0', rtd);
@@ -120,6 +153,10 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
         close(dest);
         return ((errno != 0) ? errno : -1);
     }
+    
+    /* print final progress character */
+    if (pctx)
+        fprintf(pctx->stream, "%c", pctx->character);
     
     close(src);
     close(dest);

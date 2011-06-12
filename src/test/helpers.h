@@ -25,7 +25,7 @@
 
 typedef struct
 {
-    char character;
+    unsigned char character;
     unsigned int width;
     FILE *stream;
 } hlp_progress_t;

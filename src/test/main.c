@@ -43,7 +43,7 @@ void usage(void)
         "Options:\n"
         "  -C           Don't clean up temporary files\n"
         "  -d <path>    Use <path> for temporary files. Defaults to %s\n"
-        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n",
+        "  -r <path>    Use <path> to read random bytes. Defaults to %s\n"
         "  -z <path>    Use <path> to read zero bytes. Defaults to %s\n\n",
         DEFAULT_DIR, DEFAULT_RANDOM, DEFAULT_ZERO
     );
