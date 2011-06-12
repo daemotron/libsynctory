@@ -38,7 +38,22 @@ typedef struct
 }
 
 
-void    hlp_abs_path(const char *source, char *dest, size_t len);
+typedef struct
+{
+    unsigned char separator;
+    unsigned char cwd;
+} hlp_path_ctx_t;
+
+
+#define hlp_path_ctx_init(ctx) {        \
+    (ctx)->separator = '\0';            \
+    (ctx)->cwd = '\0';                  \
+}
+
+
+void    hlp_path_abs(const char *source, char *dest, size_t len);
+void    hlp_path_join(const hlp_path_ctx_t *ctx, char *path1, const char *path2, void *buffer, size_t size);
+void    hlp_path_normalize(char *path, const hlp_path_ctx_t *ctx);
 int     hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx);
 void    hlp_report_error(int error_no);
 

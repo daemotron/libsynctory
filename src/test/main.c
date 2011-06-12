@@ -73,19 +73,19 @@ int main(int argc, char **argv)
                 break;
             case 'd':
                 if (NULL != optarg)
-                    hlp_abs_path(optarg, ctx.workdir, 2048);
+                    hlp_path_abs(optarg, ctx.workdir, 2048);
                 else
                     return EXIT_FAILURE;
                 break;
             case 'r':
                 if (NULL != optarg)
-                    hlp_abs_path(optarg, ctx.random_device, 2048);
+                    hlp_path_abs(optarg, ctx.random_device, 2048);
                 else
                     return EXIT_FAILURE;
                 break;
             case 'z':
                 if (NULL != optarg)
-                    hlp_abs_path(optarg, ctx.zero_device, 2048);
+                    hlp_path_abs(optarg, ctx.zero_device, 2048);
                 else
                     return EXIT_FAILURE;
                 break;
@@ -97,13 +97,13 @@ int main(int argc, char **argv)
     }
     
     if (strlen(ctx.workdir) == 0)
-        hlp_abs_path(DEFAULT_DIR, ctx.workdir, 2048);
+        hlp_path_abs(DEFAULT_DIR, ctx.workdir, 2048);
     
     if (strlen(ctx.random_device) == 0)
-        hlp_abs_path(DEFAULT_RANDOM, ctx.random_device, 2048);
+        hlp_path_abs(DEFAULT_RANDOM, ctx.random_device, 2048);
 
     if (strlen(ctx.zero_device) == 0)
-        hlp_abs_path(DEFAULT_ZERO, ctx.zero_device, 2048);
+        hlp_path_abs(DEFAULT_ZERO, ctx.zero_device, 2048);
 
     
     /* determine total number of tests */

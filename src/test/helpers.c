@@ -27,7 +27,7 @@
 #include "helpers.h"
 
 
-void hlp_abs_path(const char *source, char *dest, size_t len)
+void hlp_path_abs(const char *source, char *dest, size_t len)
 {
     char *ptr = dest;
     size_t fbytes = len - 1;
@@ -63,6 +63,139 @@ void hlp_abs_path(const char *source, char *dest, size_t len)
     }
     
     ptr[0] = '\0';
+}
+
+
+void hlp_path_join(const hlp_path_ctx_t *ctx, char *path1, const char *path2, void *buffer, size_t size)
+{
+    char *ptr = (char *)buffer;
+    char *aptr = NULL;
+    size_t fbytes = size - 1;
+    size_t cbytes = 0;
+    size_t i;
+
+    memset(buffer, (int)'\0', size);
+    
+    cbytes = (fbytes < strlen(path1) ? fbytes : strlen(path1));
+    strncpy(ptr, path1, cbytes);
+    ptr += cbytes;
+    fbytes -= cbytes;
+    ptr[0] = '\0';
+
+    if (fbytes <= 0)
+        return;
+    
+    if (cbytes > 0)
+        aptr = (ptr - 1);
+    
+    if (aptr[0] != ctx->separator)
+    {
+        ptr[0] = ctx->separator;
+        ptr++;
+        fbytes--;
+        ptr[0] = '\0';
+    }
+    
+    if (fbytes <= 0)
+        return;
+    
+    for (i = 0; i < strlen(path2); i++)
+    {
+        if (path2[i] != ctx->separator)
+            break;
+    }
+    
+    cbytes = (fbytes < strlen(&path2[i]) ? fbytes : strlen(&path2[i]));
+    strncpy(ptr, &path2[i], cbytes);
+
+    ptr += cbytes;
+    ptr[0] = '\0';
+}
+
+
+void hlp_path_normalize(char *path, const hlp_path_ctx_t *ctx)
+{
+    size_t bufsize = strlen(path) + 1;
+    size_t fbytes = strlen(path);
+    size_t cbytes;
+    char *auxbuf = NULL;
+    char *sptr = NULL, *dptr = NULL, *rctx, *token, *lookahead;
+    char sep[2], oneup[3], curdir[2];
+    
+    auxbuf = (char *)malloc(bufsize);
+    if (NULL == auxbuf)
+        return;
+    
+    sptr = path;
+    dptr = auxbuf;
+    
+    if (sptr[0] == ctx->separator)
+    {
+        dptr[0] = sptr[0];
+        dptr++;
+        sptr++;
+        fbytes--;
+    }
+    
+    snprintf(sep, 2, "%c", ctx->separator);
+    snprintf(oneup, 3, "%c%c", ctx->cwd, ctx->cwd);
+    snprintf(curdir, 2, "%c", ctx->cwd);
+    
+    /* get initial token and lookahead */
+    token = strtok_r(sptr, sep, &rctx);
+    lookahead = strtok_r(NULL, sep, &rctx);
+    
+    while (token != NULL)
+    {
+        /* skip cwd sequences (e. g. . on unix) */
+        while ((1 == strlen(lookahead)) && (0 == strncmp(lookahead, curdir, 2)) && (NULL != lookahead))
+            lookahead = strtok_r(NULL, sep, &rctx);
+        
+        /* only consider tokens which are no cwd sequences */
+        if (!((2 == strlen(token)) && (0 == strncmp(token, curdir, 2))))
+        {
+            /* consider token if it is a oneup sequence */
+            if ((2 == strlen(token)) && (0 == strncmp(token, oneup, 3)))
+            {
+                cbytes = ((fbytes < strlen(token)) ? fbytes : strlen(token));
+                strncpy(dptr, token, cbytes);
+                dptr += cbytes;
+                dptr[0] = ctx->separator;
+                dptr++;
+                dptr[0] = '\0';
+                fbytes -= cbytes;
+                fbytes--;
+            }
+            else
+            {
+                /* only consider token if lookahead is not a oneup sequence */
+                if (!((2 == strlen(lookahead)) && (0 == strncmp(lookahead, oneup, 3))))
+                {
+                    cbytes = ((fbytes < strlen(token)) ? fbytes : strlen(token));
+                    strncpy(dptr, token, cbytes);
+                    dptr += cbytes;
+                    dptr[0] = ctx->separator;
+                    dptr++;
+                    dptr[0] = '\0';
+                    fbytes -= cbytes;
+                    fbytes--;
+                }
+                else
+                {
+                    /* lookahead was a oneup sequence already compensated by skipping current token => proceed to next */
+                    lookahead = strtok_r(NULL, sep, &rctx);
+                }
+            }
+        }
+            
+        /* next token and lookahead */
+        token = lookahead;
+        lookahead = strtok_r(NULL, sep, &rctx);
+    }
+    cbytes = ((strlen(auxbuf) > (bufsize - 1)) ? (bufsize - 1) : strlen(auxbuf));
+    strncpy(path, auxbuf, cbytes);
+    path[cbytes] = '\0';
+    free(auxbuf);
 }
 
 
