@@ -22,6 +22,7 @@ set(
     SYNCTORY_TEST_CASES
     test_version.c
     test_fingerprint.c
+    test_diff.c
 )
 
 

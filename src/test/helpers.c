@@ -193,6 +193,77 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
 }
 
 
+int hlp_file_randmod(const char *path, unsigned int mod_amount, off_t *positions, unsigned char *orig_chars, unsigned char *mod_chars)
+{
+    off_t filesize;
+    int fd;
+    unsigned int i, j, flag;
+    void *buf = NULL;
+    
+    buf = malloc(1);
+    if (NULL == buf)
+        return errno;
+    
+    fd = open(path, O_RDWR);
+    if (fd < 0)
+    {
+        free(buf);
+        return errno;
+    }
+    
+    filesize = lseek(fd, 0, SEEK_END);
+    if (filesize < 0)
+    {
+        free(buf);
+        close(fd);
+        return errno;
+    }
+    
+    /* determine positions to change */
+    sranddev();
+    for (i = 0; i < mod_amount; i++)
+    {
+        /*
+         * Make sure all positions to modify are different from each other.
+         * This is necessary to guarantee the requested amount of modifications.
+         */
+        flag = 1;
+        while (flag)
+        {
+            positions[i] = (rand() % filesize);
+            flag = 0;
+            for (j = i - 1; j <= i; j--)
+                if (positions[j] == positions[i])
+                    flag = 1;
+        }
+        if (1 != pread(fd, buf, 1, positions[i]))
+        {
+            close(fd);
+            free(buf);
+            return errno;
+        }
+        orig_chars[i] = (*(unsigned char*)buf);
+        
+        /* 
+         * Make sure the modified character is different from the original one.
+         * This is necessary to guarantee the expected number of modifications.
+         */
+        mod_chars[i] = orig_chars[i];
+        while (mod_chars[i] == orig_chars[i])
+            mod_chars[i] = (unsigned char)(rand() % 256);
+        if (1 != pwrite(fd,&(mod_chars[i]), 1, positions[i]))
+        {
+            close(fd);
+            free(buf);
+            return errno;
+        }
+    }
+    close(fd);
+    free(buf);
+    return 0;
+}
+
+
 void hlp_report_error(int error_no)
 {
     if (error_no > 0)

@@ -31,6 +31,7 @@
 
 void test_version(const test_ctx_t *ctx, int *status);
 void test_fingerprint(const test_ctx_t *ctx, int *status);
+void test_diff(const test_ctx_t *ctx, int *status);
 
 
 
