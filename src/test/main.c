@@ -124,6 +124,7 @@ int main(int argc, char **argv)
     printf("Settings for current test run:\n------------------------------\n\n");
     printf("Working directory:          %s\n", ctx.workdir);
     printf("Random device:              %s\n", ctx.random_device);
+    printf("Zero device:                %s\n", ctx.zero_device);
     printf("Delete temporary files:     ");
     if (ctx.cleanup)
         printf("YES\n");
