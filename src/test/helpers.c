@@ -264,6 +264,58 @@ int hlp_file_randmod(const char *path, unsigned int mod_amount, off_t *positions
 }
 
 
+int hlp_file_bincompare(const char* file1, const char* file2)
+{
+    int rval = 0;
+    int fp1, fp2;
+    off_t s1, s2, i;
+    unsigned char c1 = '\0', c2= '\0';
+    
+    fp1 = open(file1, O_RDONLY);
+    if (fp1 < 0)
+        return errno;
+    
+    fp2 = open(file2, O_RDONLY);
+    if (fp2 < 0)
+    {
+        close(fp1);
+        return errno;
+    }
+    
+    s1 = lseek(fp1, 0, SEEK_END);
+    s2 = lseek(fp2, 0, SEEK_END);
+    lseek(fp1, 0, SEEK_SET);
+    lseek(fp2, 0, SEEK_SET);
+    
+    if ((s1 < 0) || (s2 < 0))
+        rval = errno;
+    else
+    {
+        if (s1 == s2)
+        {
+            for (i = 0; i <= s1; i++)
+            {
+                c1 = '\0';
+                c2 = '\0';
+                pread(fp1, &c1, 1, i);
+                pread(fp2, &c2, 1, i);
+                if (c1 != c2)
+                {
+                    rval = -1;
+                    break;
+                }
+            }
+        }
+        else
+            rval = -1;
+    }
+    
+    close(fp1);
+    close(fp2);
+    return rval;
+}
+
+
 void hlp_report_error(int error_no)
 {
     if (error_no > 0)
