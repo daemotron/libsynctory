@@ -15,6 +15,7 @@
  */
 
 
+#include <sys/param.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stddef.h>
@@ -27,175 +28,58 @@
 #include "helpers.h"
 
 
-void hlp_path_abs(const char *source, char *dest, size_t len)
+size_t hlp_path_maxlen(void)
 {
-    char *ptr = dest;
-    size_t fbytes = len - 1;
-    size_t cbytes = 0;
-    
-    if (source[0] != '/')
-    {
-        char cwd[1024] = { '\0' };
-        getcwd(cwd, 1024);
-        cbytes = (fbytes < strlen(cwd) ? fbytes: strlen(cwd));
-        strncpy(ptr, cwd, cbytes);
-        ptr += cbytes;
-        fbytes -= cbytes;
-        if (fbytes > 0)
-        {
-            ptr[0] = '/';
-            ptr++;
-            fbytes--;
-            ptr[0] = '\0';
-        }
-    }
-    
-    cbytes = (fbytes < (strlen(source) - 1) ? fbytes: (strlen(source) - 1));
-    strncpy(ptr, source, cbytes);
-    ptr += cbytes;
-    fbytes -= cbytes;
-    
-    if ((fbytes > 0) && (source[strlen(source)-1] != '/'))
-    {
-        ptr[0] = source[strlen(source)-1];
-        ptr += 1;
-        fbytes--;
-    }
-    
-    ptr[0] = '\0';
+    return (size_t)PATH_MAX;
 }
 
 
-void hlp_path_join(const hlp_path_ctx_t *ctx, char *path1, const char *path2, void *buffer, size_t size)
+int hlp_path_clean(const char *source, char *dest, size_t size)
 {
-    char *ptr = (char *)buffer;
+    char auxbuf[PATH_MAX + 1] = { '\0' };
+    char *resptr;
+    size_t cbytes = (((size-1) < hlp_path_maxlen()) ? (size-1) : hlp_path_maxlen());
+    
+    resptr = realpath(source, auxbuf);
+    
+    if (NULL == resptr)
+        return errno;
+    
+    strncpy(dest, auxbuf, cbytes);
+    dest[cbytes] = '\0';
+    return 0;
+}
+
+
+int hlp_path_join(const char *path1, const char *path2, void *buffer, size_t size)
+{
     char *aptr = NULL;
-    size_t fbytes = size - 1;
-    size_t cbytes = 0;
-    size_t i;
-
-    memset(buffer, (int)'\0', size);
-    
-    cbytes = (fbytes < strlen(path1) ? fbytes : strlen(path1));
-    strncpy(ptr, path1, cbytes);
-    ptr += cbytes;
-    fbytes -= cbytes;
-    ptr[0] = '\0';
-
-    if (fbytes <= 0)
-        return;
-    
-    if (cbytes > 0)
-        aptr = (ptr - 1);
-    
-    if (aptr[0] != ctx->separator)
-    {
-        ptr[0] = ctx->separator;
-        ptr++;
-        fbytes--;
-        ptr[0] = '\0';
-    }
-    
-    if (fbytes <= 0)
-        return;
-    
-    for (i = 0; i < strlen(path2); i++)
-    {
-        if (path2[i] != ctx->separator)
-            break;
-    }
-    
-    cbytes = (fbytes < strlen(&path2[i]) ? fbytes : strlen(&path2[i]));
-    strncpy(ptr, &path2[i], cbytes);
-
-    ptr += cbytes;
-    ptr[0] = '\0';
-}
-
-
-void hlp_path_normalize(char *path, const hlp_path_ctx_t *ctx)
-{
-    size_t bufsize = strlen(path) + 1;
-    size_t fbytes = strlen(path);
-    size_t cbytes;
     char *auxbuf = NULL;
-    char *sptr = NULL, *dptr = NULL, *rctx, *token, *lookahead;
-    char sep[2], oneup[3], curdir[2];
+    size_t buflen;
+    int rval;
     
-    auxbuf = (char *)malloc(bufsize);
+    buflen = strlen(path1) + strlen(path2) + 2;
+    auxbuf = (char *)malloc(buflen);
     if (NULL == auxbuf)
-        return;
+        return errno;
     
-    sptr = path;
-    dptr = auxbuf;
+    memset(buffer, (int)'\0', size);
+    memset(auxbuf, (int)'\0', buflen);
     
-    if (sptr[0] == ctx->separator)
-    {
-        dptr[0] = sptr[0];
-        dptr++;
-        sptr++;
-        fbytes--;
-    }
+    aptr = auxbuf;
     
-    snprintf(sep, 2, "%c", ctx->separator);
-    snprintf(oneup, 3, "%c%c", ctx->cwd, ctx->cwd);
-    snprintf(curdir, 2, "%c", ctx->cwd);
+    strncpy(aptr, path1, strlen(path1));
+    aptr += strlen(path1);
+    aptr[0] = '/';
+    aptr++;
+    strncpy(aptr, path2, strlen(path2));
+    aptr += strlen(path2);
+    aptr[0] = '\0';
     
-    /* get initial token and lookahead */
-    token = strtok_r(sptr, sep, &rctx);
-    lookahead = strtok_r(NULL, sep, &rctx);
+    rval = hlp_path_clean(auxbuf, buffer, size);
     
-    while (token != NULL)
-    {
-        /* skip cwd sequences (e. g. . on unix) */
-        while ((1 == strlen(lookahead)) && (0 == strncmp(lookahead, curdir, 2)) && (NULL != lookahead))
-            lookahead = strtok_r(NULL, sep, &rctx);
-        
-        /* only consider tokens which are no cwd sequences */
-        if (!((2 == strlen(token)) && (0 == strncmp(token, curdir, 2))))
-        {
-            /* consider token if it is a oneup sequence */
-            if ((2 == strlen(token)) && (0 == strncmp(token, oneup, 3)))
-            {
-                cbytes = ((fbytes < strlen(token)) ? fbytes : strlen(token));
-                strncpy(dptr, token, cbytes);
-                dptr += cbytes;
-                dptr[0] = ctx->separator;
-                dptr++;
-                dptr[0] = '\0';
-                fbytes -= cbytes;
-                fbytes--;
-            }
-            else
-            {
-                /* only consider token if lookahead is not a oneup sequence */
-                if (!((2 == strlen(lookahead)) && (0 == strncmp(lookahead, oneup, 3))))
-                {
-                    cbytes = ((fbytes < strlen(token)) ? fbytes : strlen(token));
-                    strncpy(dptr, token, cbytes);
-                    dptr += cbytes;
-                    dptr[0] = ctx->separator;
-                    dptr++;
-                    dptr[0] = '\0';
-                    fbytes -= cbytes;
-                    fbytes--;
-                }
-                else
-                {
-                    /* lookahead was a oneup sequence already compensated by skipping current token => proceed to next */
-                    lookahead = strtok_r(NULL, sep, &rctx);
-                }
-            }
-        }
-            
-        /* next token and lookahead */
-        token = lookahead;
-        lookahead = strtok_r(NULL, sep, &rctx);
-    }
-    cbytes = ((strlen(auxbuf) > (bufsize - 1)) ? (bufsize - 1) : strlen(auxbuf));
-    strncpy(path, auxbuf, cbytes);
-    path[cbytes] = '\0';
     free(auxbuf);
+    return rval;
 }
 
 
@@ -246,15 +130,21 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
             if (n >= (pctx->width - 1))
             {
                 /* print progress character every umtenth time */
-                if (i % (n/(pctx->width - 1)))
+                if (!(i % (n/(pctx->width - 1))))
+                {
                     fprintf(pctx->stream, "%c", pctx->character);
+                    fflush(pctx->stream);
+                }
             }
             /* case 2: more progress characters to print than chuncs to copy */
             else
             {
                 /* print umph progress characters with every copied chunk */
                 for (j = 0; j < ((pctx->width - 1) / n); j++)
+                {
                     fprintf(pctx->stream, "%c", pctx->character);
+                    fflush(pctx->stream);
+                }
             }    
         }
     }
@@ -265,7 +155,10 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
         if (n < (pctx->width - 1))
         {
             for (j = 0; j < ((pctx->width - 1) % n); j++)
+            {
                 fprintf(pctx->stream, "%c", pctx->character);
+                fflush(pctx->stream);
+            }
         }
     }
     
@@ -289,7 +182,10 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
     
     /* print final progress character */
     if (pctx)
+    {
         fprintf(pctx->stream, "%c", pctx->character);
+        fflush(pctx->stream);
+    }
     
     close(src);
     close(dest);

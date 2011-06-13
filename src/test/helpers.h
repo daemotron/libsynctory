@@ -18,6 +18,7 @@
 #ifndef __SYNCTORY_TEST_HELPERS_
 #define __SYNCTORY_TEST_HELPERS_
 
+#include <stddef.h>
 #include <stdio.h>
 
 #define HLP_CHUNK_SIZE  512
@@ -32,28 +33,16 @@ typedef struct
 
 
 #define hlp_progress_init(ctx) {        \
-    (ctx)->char = '\0';                 \
+    (ctx)->character = '\0';            \
     (ctx)->width = 0;                   \
     (ctx)->stream = NULL;               \
 }
 
 
-typedef struct
-{
-    unsigned char separator;
-    unsigned char cwd;
-} hlp_path_ctx_t;
+size_t  hlp_path_maxlen(void);
+int     hlp_path_clean(const char *source, char *dest, size_t size);
+int     hlp_path_join(const char *path1, const char *path2, void *buffer, size_t size);
 
-
-#define hlp_path_ctx_init(ctx) {        \
-    (ctx)->separator = '\0';            \
-    (ctx)->cwd = '\0';                  \
-}
-
-
-void    hlp_path_abs(const char *source, char *dest, size_t len);
-void    hlp_path_join(const hlp_path_ctx_t *ctx, char *path1, const char *path2, void *buffer, size_t size);
-void    hlp_path_normalize(char *path, const hlp_path_ctx_t *ctx);
 int     hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx);
 void    hlp_report_error(int error_no);
 
