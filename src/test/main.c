@@ -44,6 +44,7 @@ void usage(void)
         "  -C           Don't clean up temporary files\n"
         "  -d <path>    Use <path> for temporary files. Defaults to %s\n"
         "  -r <path>    Use <path> to read random bytes. Defaults to %s\n"
+        "  -s <number>  Skip test <number>. Can be indicated several times\n"
         "  -z <path>    Use <path> to read zero bytes. Defaults to %s\n\n",
         DEFAULT_DIR, DEFAULT_RANDOM, DEFAULT_ZERO
     );
@@ -54,14 +55,17 @@ void usage(void)
 int main(int argc, char **argv)
 {
     int ch, test_cur, test_total, i;
-    size_t maxlen = 0;
     int *result;
     test_ctx_t ctx;
     char namebuf[100] = { '\0' };
+    int skip[256] = { -1 };
+    int skipcount = 0;
+    int skipflag;
     
     test_init(&ctx);
+    memset(skip, -1, 256*sizeof(int));
     
-    while ((ch = getopt(argc, argv, "hCd:r:z:")) != -1)
+    while ((ch = getopt(argc, argv, "hCd:r:z:s:")) != -1)
     {
         switch (ch)
         {
@@ -82,6 +86,12 @@ int main(int argc, char **argv)
                     hlp_path_clean(optarg, ctx.random_device, 2048);
                 else
                     return EXIT_FAILURE;
+                break;
+            case 's':
+                skip[skipcount] = atoi(optarg);
+                skipcount++;
+                if (skipcount > 255)
+                    skipcount--;
                 break;
             case 'z':
                 if (NULL != optarg)
@@ -141,26 +151,44 @@ int main(int argc, char **argv)
         for (i = 0; i < (int)strlen(namebuf); i++)
             printf("-");
         printf("\n\n");
-        
-        if (strlen(namebuf) > maxlen)
-            maxlen = strlen(namebuf);
-        
-        test_run(test_cur, &ctx, &result[test_cur]);
-        
-        printf("\nTest %02d of %02d ", test_cur + 1, test_total);
-        if (result[test_cur])
+
+        skipflag = 0;
+        for (i = 0; i < 256; i++)
         {
-            printf("failed: ");
-            hlp_report_error(result[test_cur]);
-            printf("\n\n");
+            if (skip[i] == (test_cur + 1))
+            {
+                skipflag = 1;
+                break;
+            }
+        }
+        if (skipflag )
+        {
+            result[test_cur] = 0;
+            printf("\nTest %02d of %02d skipped.\n\n\n", test_cur + 1, test_total);
         }
         else
-            printf("passed.\n\n\n");
+        {
+            test_run(test_cur, &ctx, &i);
+            
+            printf("\nTest %02d of %02d ", test_cur + 1, test_total);
+            if (i)
+            {
+                printf("failed: ");
+                result[test_cur] = 1;
+                hlp_report_error(i);
+                printf("\n\n");
+            }
+            else
+            {
+                result[test_cur] = 2;
+                printf("passed.\n\n\n");
+            }
+        }
     }
     
     printf("\nTest Summary\n============\n\n");
     printf("Test No.  Description                                                     Result\n"
-           "--------  --------------------------------------------------------------  ------\n");
+           "--------  --------------------------------------------------------------  -------\n");
     
     for (test_cur = 0; test_cur < test_total; test_cur++)
     {
@@ -176,10 +204,12 @@ int main(int argc, char **argv)
                 printf(" ");
             printf("  ");
         }
-        if (result[test_cur])
+        if (result[test_cur] == 1)
             printf("failed\n");
-        else
+        else if (result[test_cur] == 2)
             printf("passed\n");
+        else
+            printf("skipped\n");
     }
     printf("\n");
     return EXIT_SUCCESS;
