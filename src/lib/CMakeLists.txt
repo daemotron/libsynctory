@@ -28,6 +28,7 @@ set(
     fingerprint.c
     synth.c
     synctory.c
+    tree.c
 )
 
 # check whether liblzma can be used
