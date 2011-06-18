@@ -102,6 +102,33 @@ synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const char *source
     dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
     ffd = _synctory_file64_get_fd(&flag[0], fingerprint_fd, fingerprint_file, 'r');
     
+    rval = _synctory_diff_create_fast(ffd, sfd, dfd);
+    
+    if (flag[0])
+        _synctory_file64_close(sfd);
+    if (flag[1])
+        _synctory_file64_close(dfd);
+    if (flag[2])
+        _synctory_file64_close(ffd);
+
+    return rval;
+}
+
+
+extern int
+synctory_diff_lomem(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file)
+{
+    /* sfd = source file descriptor, dfd = destination file descriptor */
+    int sfd = 0;
+    int dfd = 0;
+    int ffd = 0;
+    int flag[3] = {0, 0, 0};
+    int rval = 0;
+    
+    sfd = _synctory_file64_get_fd(&flag[0], source_fd, source_file, 'r');
+    dfd = _synctory_file64_get_fd(&flag[1], dest_fd, dest_file, 'w');
+    ffd = _synctory_file64_get_fd(&flag[0], fingerprint_fd, fingerprint_file, 'r');
+    
     rval = _synctory_diff_create_fd(ffd, sfd, dfd);
     
     if (flag[0])

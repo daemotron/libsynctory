@@ -67,11 +67,14 @@ typedef struct _tree_node_s
 
 typedef TREE_HEAD(_tree_head_s, _tree_node_s) _tree_t;
 
-TREE_DEFINE(_tree_node_s, linkage)
+#define TREE_SEARCH(head, elm)                  TREE_FIND((head), _tree_node_s, linkage, (elm))
+#define TREE_APPEND(head, elm)                  TREE_INSERT((head), _tree_node_s, linkage, (elm))
+#define TREE_FWD_APPLY(tree, function, data)    TREE_FORWARD_APPLY((tree), _tree_node_s, linkage, (function), (data))
 
 
 int             _tree_node_compare(_tree_node_t *lhs, _tree_node_t *rhs);
 _tree_node_t   *_tree_node_new(uint32_t checksum);
 _tree_t        *_tree_new(int (*compare)(_tree_node_t *lhs, _tree_node_t *rhs));
+/*void            _tree_node_delete(_tree_node_t *node, void *tree);*/
 
 #endif /* __LIBSYNCTORY_TREE_H_ */

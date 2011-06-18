@@ -52,3 +52,10 @@ _tree_new(int (*compare)(_tree_node_t *lhs, _tree_node_t *rhs))
     TREE_INIT(self, compare);
     return self;
 }
+
+
+/*void
+_tree_node_delete(_tree_node_t *node, void *tree)
+{
+    TREE_REMOVE((_tree_t *)tree, _tree_node_s, linkage, node);
+}*/

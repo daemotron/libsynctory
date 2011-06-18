@@ -146,6 +146,19 @@ extern int synctory_diff(int source_fd, int dest_fd, int fingerprint_fd, const c
 
 
 /**
+ * Create a diff file using a low memory profile.
+ * 
+ * This function operates in the same way as synctory_diff; the only difference is
+ * that its memory footprint is not dependend on the amount of fingerprint chunks
+ * to process.
+ * 
+ * Therefore this function is useful to process extremely large fingerprint files.
+ * It can also be used in environments with limited memory availability.
+ */
+extern int synctory_diff_lomem(int source_fd, int dest_fd, int fingerprint_fd, const char *source_file, const char *dest_file, const char *fingerprint_file);
+
+
+/**
  * Synthesize a file based on a diff and a source file.
  * 
  * Using this function, it is possible to synthesize the file f2 (see comments

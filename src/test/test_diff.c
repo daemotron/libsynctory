@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "tests.h"
@@ -32,42 +33,48 @@
 
 void test_diff(const test_ctx_t *ctx, int *status)
 {
-    char *filename_o = NULL, *filename_m = NULL, *filename_fp = NULL, *filename_df = NULL;
+    char *filename_o = NULL, *filename_m = NULL, *filename_fp = NULL, *filename_df = NULL, *filename_dl = NULL;
     hlp_progress_t pgctx;
     size_t fnamesize;
     size_t fnamesize_fp;
     size_t fnamesize_df;
+    size_t fnamesize_dl;
     int rval;
     synctory_ctx_t sctx;
     off_t modpos[5];
     unsigned char obytes[5];
     unsigned char mbytes[5];
+    clock_t start, stop;
     
     synctory_init(&sctx);
     
     fnamesize = strlen(ctx->workdir) + 16;
     fnamesize_fp = strlen(ctx->workdir) + 19;
-    fnamesize_df = strlen(ctx->workdir) + 21;
+    fnamesize_df = strlen(ctx->workdir) + 26;
+    fnamesize_dl = strlen(ctx->workdir) + 27;
     
     filename_o = (char *)malloc(fnamesize);
     filename_m = (char *)malloc(fnamesize);
     filename_fp = (char *)malloc(fnamesize_fp);
     filename_df = (char *)malloc(fnamesize_df);
+    filename_dl = (char *)malloc(fnamesize_dl);
     
-    if ((NULL == filename_o) || (NULL == filename_m) || (NULL == filename_fp) || (NULL == filename_df))
+    if ((NULL == filename_o) || (NULL == filename_m) || (NULL == filename_fp) || (NULL == filename_df) || (NULL == filename_dl))
     {
         *status = errno;
         free(filename_o);
         free(filename_m);
         free(filename_fp);
         free(filename_df);
+        free(filename_dl);
         return;
     }
     
     hlp_path_join(ctx->workdir, "test_diff.orig", filename_o, fnamesize);
     hlp_path_join(ctx->workdir, "test_diff.modf", filename_m, fnamesize);
     hlp_path_join(ctx->workdir, "test_diff.orig.fp", filename_fp, fnamesize_fp);
-    hlp_path_join(ctx->workdir, "test_diff.modf.diff", filename_df, fnamesize_df);
+    hlp_path_join(ctx->workdir, "test_diff.modf.diff_fast", filename_df, fnamesize_df);
+    hlp_path_join(ctx->workdir, "test_diff.modf.diff_lomem", filename_dl, fnamesize_dl);
     
      /* prepare test file */
     hlp_progress_init(&pgctx);
@@ -110,9 +117,31 @@ void test_diff(const test_ctx_t *ctx, int *status)
     else
         printf("success\n");
     
-    printf("\n  generating diff from fingerprint and modified file                   ");
+    printf("\n  generating fast diff from fingerprint and modified file              ");
     fflush(stdout);
+    start = clock();
     rval = synctory_diff(-1, -1, -1, filename_m, filename_df, filename_fp);
+    stop = clock();
+    if (rval)
+        printf("failed\n");
+    else
+        printf("success\n");
+    printf("  => consumed %.2f seconds of CPU time\n", (float)(stop-start) / CLOCKS_PER_SEC);
+    
+    printf("\n  generating lomem diff from fingerprint and modified file             ");
+    fflush(stdout);
+    start = clock();
+    rval = synctory_diff_lomem(-1, -1, -1, filename_m, filename_dl, filename_fp);
+    stop = clock();
+    if (rval)
+        printf("failed\n");
+    else
+        printf("success\n");
+    printf("  => consumed %.2f seconds of CPU time\n", (float)(stop-start) / CLOCKS_PER_SEC);
+    
+    printf("\n  comparing both created diff files (fast and lomem)                   ");
+    fflush(stdout);
+    rval = hlp_file_bincompare(filename_df, filename_dl);
     if (rval)
         printf("failed\n");
     else
@@ -124,9 +153,11 @@ void test_diff(const test_ctx_t *ctx, int *status)
         unlink(filename_m);
         unlink(filename_fp);
         unlink(filename_df);
+        unlink(filename_dl);
     }
     
     free(filename_df);
+    free(filename_dl);
     free(filename_fp);
     free(filename_m);
     free(filename_o);

@@ -33,6 +33,11 @@
  * file handle, compared to the file content read from the fdsource file
  * handle and stored in the file designated by the fddiff file handle.
  */
+int _synctory_diff_create_fast(int fdfinger, int fdsource, int fddiff);
+
+/**
+ * Create binary diff by using a low memory profile (slow!)
+ */
 int _synctory_diff_create_fd(int fdfinger, int fdsource, int fddiff);
 
 /**
