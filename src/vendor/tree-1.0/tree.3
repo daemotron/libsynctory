@@ -1,0 +1,344 @@
+.\"     $NetBSD: queue.3,v 1.4 1995/07/03 00:25:36 mycroft Exp $
+.\" 
+.\" Copyright (c) 2005 Ian Piumarta
+.\" 
+.\" All rights reserved.
+.\" 
+.\" Permission is hereby granted, free of charge, to any person obtaining a copy
+.\" of this software and associated documentation files (the 'Software'), to deal
+.\" in the Software without restriction, including without limitation the rights
+.\" to use, copy, modify, merge, publish, distribute, and/or sell copies of the
+.\" Software, and to permit persons to whom the Software is furnished to do so,
+.\" provided that the above copyright notice(s) and this permission notice appear
+.\" in all copies of the Software and that both the above copyright notice(s) and
+.\" this permission notice appear in supporting documentation.
+.\" 
+.\" THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+.\"
+.Dd November 11, 2005
+.Dt TREE 3
+.Os ""
+.\" ----------------------------------------------------------------
+.Sh NAME
+.\" 
+.Nm TREE_ENTRY ,
+.Nm TREE_HEAD ,
+.Nm TREE_INITIALIZER ,
+.Nm TREE_INIT ,
+.Nm TREE_DEFINE ,
+.Nm TREE_INSERT ,
+.Nm TREE_FIND ,
+.Nm TREE_REMOVE ,
+.Nm TREE_FORWARD_APPLY ,
+.Nm TREE_REVERSE_APPLY
+.Nd implementation of AVL balanced binary trees
+.\" ----------------------------------------------------------------
+.Sh SYNOPSIS
+.\" 
+.Fd #include <tree.h>
+.sp
+.Fn TREE_ENTRY "NODE"
+.Fn TREE_HEAD "TREE" "NODE"
+.Fn TREE_INITIALIZER "int (*relation)(NODE *, NODE *)"
+.Fn TREE_INIT "TREE *head" "int (*relation)(NODE *, NODE *)"
+.Fn TREE_DEFINE "NODE" "NAME"
+.Fn TREE_INSERT "TREE *head" "NODE" "NODE *elm"
+.Fn TREE_REMOVE "TREE *head" "NODE" "NODE *elm"
+.Fn TREE_FIND "TREE *head" "NODE" "NODE *elm"
+.Fn TREE_FORWARD_APPLY "TREE *head" "void (*function)(TYPE *elm, void *data)" "void *data"
+.Fn TREE_REVERSE_APPLY "TREE *head" "void (*function)(TYPE *elm, void *data)" "void *data"
+.\" ----------------------------------------------------------------
+.Sh DESCRIPTION
+.\" 
+These macros define and operate on AVL balanced binary trees.  The trees
+support the following functionality:
+.Bl -enum -compact -offset indent
+.It
+Insertion of a new entry in the tree.
+.It
+Removal of any entry in the tree.
+.It
+Search for any entry in the tree.
+.It
+Forward traversal through the tree.
+.It
+Backward traversal through the tree.
+.El
+.Pp
+In the macro definitions,
+.Fa NODE
+is the name (tag) of a user-defined structure, that must contain a
+field of type
+.Li TREE_ENTRY
+named
+.Fa NAME ,
+and
+.Fa TREE
+is the name (tag) of a user-defined structure representing the head
+of the tree that must be declared using the macro
+.Li TREE_HEAD .
+.Pp
+A tree is headed by a structure defined by the
+.Nm TREE_HEAD
+macro.  This structure contains a pointer to the root node of the tree
+and a pointer to a function that defines the ordering relation between
+nodes.  A
+.Fa TREE_HEAD
+structure is declared as follows:
+.Bd -literal -offset indent
+TREE_HEAD(TREE, NODE) head;
+.Ed
+.sp
+where
+.Fa TREE
+is the name (tag) of the structure to be defined, and
+.Fa NODE
+is the name (struture tag) of the elements to be inserted into the
+tree.  A pointer to the head of the tree can later be declared as:
+.Bd -literal -offset indent
+struct TREE *treep;
+.Ed
+.sp
+(The name
+.Li treep
+is user selectable.)
+.Pp
+The prototypes for the four macros that accept function arguments
+might be confusing.  If namespace pollution were not an issue the
+following declarations using explicit typedefs would be exactly
+equivalent:
+.Bd -literal -offset indent 
+typedef int (*ORDER_FN)(NODE *lhs, NODE *rhs);
+
+TREE_INIT(TREE *head, ORDER_FN relation);
+TREE_INITIALIZER(ORDER_FN relation);
+
+typedef int (*VISITOR)(NODE *elm, void *client_data);
+
+TREE_FORWARD_APPLY(TREE *head, VISITOR func, void *client_data);
+TREE_REVERSE_APPLY(TREE *head, VISITOR func, void *client_data);
+.Ed
+.Pp
+The macro
+.Nm TREE_ENTRY
+declares a structure that connects the elements in the tree.
+.Pp
+The macro
+.Nm TREE_INIT
+initializes the tree referenced by
+.Fa head
+ordered according to the given
+.Fa relation ,
+which must be a function taking two arguments of type
+.Fa NODE
+and returning -1, zero or 1 if the first argument is considered less
+than, equal to or greater than the second argument respectively.
+.Nm TREE_INITIALIZER
+provides a corresponding static initializer.
+.Pp
+The macro
+.Nm TREE_INSERT
+inserts the new element
+.Fa elm
+into the tree and rebalances it.
+.Pp
+The macro
+.Nm TREE_REMOVE
+removes the element
+.Fa elm
+from the tree and rebalances it.
+.Pp
+The macro
+.Nm TREE_FIND
+finds an element in the tree that is equal (according to the tree's
+ordering relation) to
+.Fa elm ,
+and returns a pointer to it or NULL if no such element was found.
+.Pp
+The macro
+.Nm TREE_FORWARD_APPLY
+walks the tree in-order from left to right and calls
+.Fa function
+for each node visited passing the node as the first argument and
+.Fa data
+as the second argument.  The macro
+.Nm TREE_REVERSE_APPLY
+is similar but walks the tree from right to left.
+.Pp
+The macro
+.Nm TREE_DEFINE
+defines several recursive helper functions needed to implement trees
+containing elements of type
+.Fa NODE
+linked through a field with the given
+.Fa NAME .
+This macro should be invoked exactly once for each type of tree
+node (a unique combination of
+.Fa NODE
+tag and entry
+.Fa NAME )
+in a given program.
+.\" ----------------------------------------------------------------
+.Sh EXAMPLES
+.\" 
+The following program reads lines from standard input into a tree
+structure, inserting each unique line into the tree.  On EOF it prints
+the lines in forward and reverse alphabetical order.
+.Bd -literal
+#include "tree.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct _Node
+{
+  char                  *word;
+  TREE_ENTRY(_Node)      linkage;
+} Node;
+
+typedef TREE_HEAD(_Tree, _Node) Tree;
+
+TREE_DEFINE(_Node, linkage);
+
+int fence = 0;
+
+Node *Node_new(char *word)
+{
+  Node *self = (Node *)calloc(1, sizeof(Node));
+  self->word = strdup(word);
+  return self;
+}
+
+int Node_compare(Node *lhs, Node *rhs)
+{
+  return strcmp(lhs->word, rhs->word);
+}
+
+void Node_printer(Node *self, void *stream)
+{
+  if (fence)
+    {
+      fprintf((FILE *)stream, "%s", self->word);
+      --fence;
+    }
+}
+
+int main(int argc, char **argv)
+{
+  int   count = 0;
+  Tree  tree = TREE_INITIALIZER(Node_compare);
+  char  line[80];
+
+  while (fgets(line, sizeof(line), stdin))
+    {
+      Node test = { line };
+      Node *ptr = TREE_FIND(&tree, _Node, linkage, &test);
+      if (ptr)
+        printf("ignoring duplicate line: %s", line);
+      else
+        {
+          TREE_INSERT(&tree, _Node, linkage, Node_new(line));
+          ++count;
+        }
+    }
+
+  fence = 20;
+  printf("first %d elements, forwards:\\n", fence);
+  TREE_FORWARD_APPLY(&tree, _Node, linkage, Node_printer, stdout);
+  printf("\\n");
+
+  fence = 20;
+  printf("last %d elements, backwards:\\n", fence);
+  TREE_REVERSE_APPLY(&tree, _Node, linkage, Node_printer, stdout);
+  printf("\\n");
+
+  printf("inserted %d elements into a tree of depth %d\\n",
+         count, TREE_DEPTH(&tree, linkage));
+
+  return 0;
+}
+.Ed
+.Pp
+The above program typically sorts the contents of
+.Pa /usr/dict/words
+in less than twice the time of the system
+.Xr sort 1
+utility.
+.\" ----------------------------------------------------------------
+.Sh RETURN VALUES
+.\" 
+The macro
+.Nm TREE_FIND
+returns a pointer to an element in the tree equal to
+.Fa elm
+or NULL if no such element exists.
+.\" ----------------------------------------------------------------
+.Sh COMPATIBILITY
+.\"
+The interface conforms as closely as possible to the that of the
+standard BSD
+.Xr queue 3
+macros.
+.\" ----------------------------------------------------------------
+.Sh SEE ALSO
+.\" 
+.Xr queue 3
+.Pp
+.Rs
+.%T "An algorithm for the organization of information"
+.%A Georgii M. Adelson-Velskii and Evgenii M. Landis
+.%J "Doklady Akademii Nauk SSSR"
+.%N 146:263-266
+.%D 1962
+.%O Russian
+.Re
+.Rs
+.%A Myron J. Ricci (trans.)
+.%J "Soviet Math."
+.%N 3:1259-1263
+.%D 1962
+.%O English
+.Re
+.Rs
+.%B "The Art of Computer Programming, Vol. 3: Sorting and Searching"
+.%A Donald E. Knuth
+.%O 2nd ed
+.%D 1998
+.%P 459
+.Re
+.\" ----------------------------------------------------------------
+.Sh AUTHORS
+.\" 
+.\" 
+The software and manual pages were written by Ian Piumarta.
+.Pp
+Copyright (c) 2005 Ian Piumarta
+.sp
+All rights reserved.
+.sp
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the 'Software'), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so,
+provided that the above copyright notice(s) and this permission notice appear
+in all copies of the Software and that both the above copyright notice(s) and
+this permission notice appear in supporting documentation.
+.sp
+THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+.\" ----------------------------------------------------------------
+.Sh BUGS
+.\" 
+.Bl -bullet
+.It
+The implementation should be generalised to support linear lists in
+which elements can be searched, inserted and deleted according either
+to an ordering relation or to an explicit numeric index, all in O(log
+N) time.
+.El
+.Pp
+Please send bug reports to the author at: firstName (at) lastName
+(dot) com.  (See
+.Sx AUTHORS
+above for suitable values of firstName and lastName.)

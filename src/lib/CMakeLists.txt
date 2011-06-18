@@ -14,7 +14,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
-include_directories(${libsynctory_SOURCE_DIR}/src/config ${libsynctory_SOURCE_DIR}/src/include ${libsynctory_SOURCE_DIR}/src/lib ${libsynctory_BINARY_DIR}/src/config ${libsynctory_BINARY_DIR}/src/include)
+include_directories(${libsynctory_SOURCE_DIR}/src/config ${libsynctory_SOURCE_DIR}/src/include ${libsynctory_SOURCE_DIR}/src/lib ${libsynctory_SOURCE_DIR}/src/vendor/tree-1.0 ${libsynctory_BINARY_DIR}/src/config ${libsynctory_BINARY_DIR}/src/include)
 
 # source files that should be compiled into the library have
 # to be added to this list
