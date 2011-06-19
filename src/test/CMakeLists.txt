@@ -37,13 +37,3 @@ set(
 
 add_executable(synctory_test ${SYNCTORY_TEST_MISC} ${SYNCTORY_TEST_CASES})
 target_link_libraries(synctory_test synctory)
-
-
-#
-# the following tests are broken, deprecated and will be removed on next occasion
-#
-
-#add_subdirectory(checksum)
-#add_subdirectory(fingerprint)
-#add_subdirectory(diff)
-#add_subdirectory(synth)
