@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define HLP_CHUNK_SIZE  512
+#define HLP_CHUNK_SIZE  5120
 
 
 typedef struct
@@ -43,7 +43,7 @@ size_t  hlp_path_maxlen(void);
 int     hlp_path_clean(const char *source, char *dest, size_t size);
 int     hlp_path_join(const char *path1, const char *path2, void *buffer, size_t size);
 
-int     hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx);
+int     hlp_file_bytecopy(const char *source, const char *destination, off_t size, hlp_progress_t *pctx);
 int     hlp_file_randmod(const char *path, unsigned int mod_amount, off_t *positions, unsigned char *orig_chars, unsigned char *mod_chars);
 int     hlp_file_bincompare(const char* file1, const char* file2);
 

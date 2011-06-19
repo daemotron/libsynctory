@@ -83,13 +83,17 @@ int hlp_path_join(const char *path1, const char *path2, void *buffer, size_t siz
 }
 
 
-int hlp_file_bytecopy(const char *source, const char *destination, size_t size, hlp_progress_t *pctx)
+int hlp_file_bytecopy(const char *source, const char *destination, off_t size, hlp_progress_t *pctx)
 {
-    size_t rtd = size;
+    off_t rtd = size;
     ssize_t rbytes;
     unsigned char buffer[HLP_CHUNK_SIZE];
     int src, dest;
-    uint64_t i = 0, n = 0, j;
+    uint64_t i = 0, n = 0;
+    double k = 0;
+    unsigned int dots = 0;
+    unsigned int p = 0;
+    unsigned int z;
     
     dest = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest < 0)
@@ -100,6 +104,11 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
         return ((errno != 0) ? errno : -1);
     
     n = (uint64_t)size / (uint64_t)HLP_CHUNK_SIZE;
+    if (0 == ((uint64_t)size % (uint64_t)HLP_CHUNK_SIZE))
+        n--;
+    
+    if (pctx)
+        k = ((double)(pctx->width-1)) / ((double)n);
     
     while (rtd > HLP_CHUNK_SIZE)
     {
@@ -126,45 +135,17 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
         /* if progress context has been provided, print progress characters */
         if (pctx)
         {
-            /* case 1: more or eq. chunks than progress characters to print */
-            if (n >= (pctx->width - 1))
-            {
-                /* print progress character every umtenth time */
-                if (!(i % (n/(pctx->width - 1))))
-                {
-                    fprintf(pctx->stream, "%c", pctx->character);
-                    fflush(pctx->stream);
-                }
-            }
-            /* case 2: more progress characters to print than chuncs to copy */
-            else
-            {
-                /* print umph progress characters with every copied chunk */
-                for (j = 0; j < ((pctx->width - 1) / n); j++)
-                {
-                    fprintf(pctx->stream, "%c", pctx->character);
-                    fflush(pctx->stream);
-                }
-            }    
-        }
-    }
-    
-    /* print reminaing progress characters (only happens in case 2) */
-    if (pctx)
-    {
-        if (n < (pctx->width - 1))
-        {
-            for (j = 0; j < ((pctx->width - 1) % n); j++)
-            {
+            p = ((unsigned int)(i*k)) - dots;
+            for (z = 0; z < p; z++)
                 fprintf(pctx->stream, "%c", pctx->character);
-                fflush(pctx->stream);
-            }
+            fflush(pctx->stream);
+            dots += p;
         }
     }
     
     memset(buffer, (int)'\0', rtd);
     rbytes = read(src, &buffer[0], rtd);
-    if ((size_t)rbytes != rtd)
+    if ((off_t)rbytes != rtd)
     {
         fprintf(stderr, "Could not read enough random bytes from %s\n", source);
         close(src);
@@ -172,7 +153,7 @@ int hlp_file_bytecopy(const char *source, const char *destination, size_t size, 
         return ((errno != 0) ? errno : -1);
     }
     rbytes = write(dest, &buffer[0], rtd);
-    if ((size_t)rbytes != rtd)
+    if ((off_t)rbytes != rtd)
     {
         fprintf(stderr, "Could not write required number of bytes to %s\n", destination);
         close(src);
