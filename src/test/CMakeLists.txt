@@ -24,6 +24,7 @@ set(
     test_fingerprint.c
     test_diff.c
     test_synth.c
+    test_performance.c
 )
 
 
