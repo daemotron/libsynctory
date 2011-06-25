@@ -35,7 +35,12 @@ TREE_DEFINE(_tree_node_s, linkage)
 void
 __tree_node_delete(_tree_node_t *node, void *tree)
 {
+    int i;
     TREE_REMOVE((_tree_t *)tree, _tree_node_s, linkage, node);
+    for (i = 0; i < node->payloads; i++)
+        free(node->payload[i].strong_checksum);
+    free(node->payload);
+    free(node);
 }
 
 
@@ -304,6 +309,7 @@ _synctory_diff_create_fast(int fdfinger, int fdsource, int fddiff)
             TREE_FWD_APPLY(&ftree, __tree_node_delete, &ftree);
             return status;
         }
+        free(v);
         index++;
     }
     
@@ -397,6 +403,7 @@ _synctory_diff_create_fast(int fdfinger, int fdsource, int fddiff)
         
         _tree_node_t *w = _tree_node_new(_synctory_checksum_digest(&weaksum));
         _tree_node_t *ww = TREE_SEARCH(&ftree, w);
+        free(w);
         
         if (ww)
         {
@@ -449,6 +456,8 @@ _synctory_diff_create_fast(int fdfinger, int fdsource, int fddiff)
             curpos++;
             lchar = buffer[0];
         }
+        
+        
 
         if (curpos != _synctory_file64_seek(fdsource, curpos, SEEK_SET))
         {
